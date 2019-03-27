@@ -1,0 +1,160 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+\usepackage{braket}
+%SetFonts
+
+%SetFonts
+
+
+\title{Note on Error Mitigation}
+\author{Takahiro Yamamoto}
+%\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+\section{Type of error}
+Qubit operations are susceptible to various types of errors due to imperfect control pulses, qubit-qubit couplings (crosstalk), and environmental noise. In order to improve qubit performance, it is necessary to identify the types and magnitudes of these errors and reduce them.
+\begin{enumerate}
+\item State preparation and measurement (SPAM)
+\begin{enumerate}
+\item intrinsic
+\item extrinsic
+\end{enumerate}
+\item Gate
+\begin{enumerate}
+\item {1 qubit operation}
+\item {2 qubit operation}
+\end{enumerate}
+\end{enumerate}
+
+It will be useful to classify SPAM errors into two different types, which we will call {\em intrinsic} and {\em extrinsic}. 
+Intrinsic SPAM errors are those that are inherent in the state preparation and measurement process. 
+One example is an error initializing the $\ket{0}$ state due to thermal populations of excited states. 
+Another is dark counts when attempting to measure, say, the $\ket{1}$ state. 
+Extrinsic SPAM errors are those due to errors in the gates used to transform the initial state to the starting state (or set of states) for the experiment to be performed. 
+
+Intrinsic SPAM errors are of particular relevance to fault-tolerant quantum computing, since it turns out that quantum error correction (QEC) requirements are much more stringent on gates than on SPAM. 
+
+\section{Qubit characterization methods}
+Several methods of qubit characterization are currently available\footnote{Introduction to Quantum Gate Set Tomography, D.~Greenbaum, arXiv:1509.02921}. 
+In chronological order of their development, the main techniques are:
+\begin{enumerate}
+\item quantum state tomography (QST)
+\item quantum process tomography (QPT)
+\item randomized benchmarking (RB)
+\item quantum gate set tomography (GST)
+\end{enumerate}
+
+GST arose from the observation that QPT is inaccurate in the presence of SPAM errors. 
+In QPT, the starting states must form an informationally complete basis of the Hilbert-Schmidt space on which the gate being estimated acts. 
+These are typically created by applying gates to a given initial state, usually the $\ket{0}$ state, and these gates themselves may be faulty.
+
+According to recent results from IBM, a 50-fold increase in intrinsic SPAM error reduces the surface code threshold by only a factor of 3-4. 
+Therefore QPT -- the accuracy of which degrades with increasing SPAM -- would not be able to determine if a qubit meets threshold requirements when the ratio of intrinsic SPAM to gate error is large.
+
+This is not an issue for extrinsic SPAM errors, which go to zero as the errors on the gates go to zero. 
+Nevertheless, extrinisic SPAM error interferes with diagnostics: as an example, QPT cannot distinguish an over-rotation error on a single gate from the same error on all gates. 
+In addition, Merkel, et al. have found that, for a broad range of gate error -- including the thresholds of leading QEC code candidates -- the ratio of QPT estimation error to gate error increases as the gate error itself decreases. 
+This makes QPT less reliable as gate quality improves.
+
+Extrinsic SPAM error is also unsatisfactory from a theoretical point of view: QPT assumes the ability to perfectly prepare a complete set of states and measurements. 
+In reality, these states and measurements are prepared using the same faulty gates that QPT attempts to characterize. 
+One would like to have a characterization technique that takes account of SPAM gates self-consistently. 
+We shall see that GST is able to resolve all of these issues.
+
+Another approach to dealing with SPAM errors is provided by randomized benchmarking. 
+RB is based on the idea of twirling -- the gate being characterized is averaged in a such a way that the resulting process is depolarizing with the same average fidelity as the original gate. 
+The depolarizing parameter of the averaged process is measured experimentally, and the result is related back to the average fidelity of the original gate. 
+This technique is independent of the particular starting state of the experiment, and therefore is not affected by SPAM errors. 
+However, RB has several shortcomings which make it unsatisfactory as a sole characterization technique for fault-tolerant QIP. 
+For one thing, it is limited to Clifford gates, and so cannot be used to characterize a universal gate set for quantum computing. 
+For another, RB provides only a single metric of gate quality, the average fidelity. 
+This can be insufficient for determining the correct qubit error model to use for evaluating compatibility with QEC. 
+Several groups have shown that qualitatively different errors can produce the same average gate fidelity, and in the case of coherent errors the depolarizing channel inferred from the RB gate fidelity underestimates the effect of the error. 
+Finally, RB assumes the errors on subsequent gates are independent. 
+This assumption fails in the presence of non-Markovian, or time-dependent noise. 
+GST suffers from this assumption as well, but the long sequences used in RB make this a more pressing issue.
+
+Despite these apparent shortcomings, RB has been used with great success by several groups to measure gate fidelities and to diagnose and correct errors. 
+RB also has the advantage of scalability -- the resources required to implement RB (number of experiments, processing time) scale polynomially with the number of qubits being characterized. 
+QPT and GST, on the other hand, scale exponentially with the number of qubits. 
+As a result, these techniques will foreseeably be limited to addressing no more than 2-3 qubits at a time. 
+
+GST and RB may end up complementing each other as elements of a larger characterization protocol for any future multi-qubit quantum computer.
+
+TODO: summarize them in table.
+\begin{table}[]
+\begin{tabular}{l | l | l | l | l}
+method & assumption & advantage & disadvantage & scalability \\
+\hline
+quantum state tomography &  &  &  &  \\
+quantum process tomography &  &  &  &  \\
+randomized benchmarking &  &  &  & \\
+quantum gate set tomography &  &  &  & 
+\end{tabular}
+\end{table}
+
+\begin{enumerate}
+\item Dephasing
+\item Amplitude and phasing damping
+\item Homogeneous depolarizing
+\end{enumerate}
+
+\begin{enumerate}
+\item Localized Markovian
+\item Unbiased statistical fluctuation
+\end{enumerate}
+
+\section{Error models}
+The decay time,  ($T_1$) and dephasing time,  ($T_2$) 
+
+\section{Type of error mitigation technics}
+%\subsection{}
+\begin{enumerate}
+\item Error extrapolation
+\item Quasiprobability decomposition
+\item Quantum subspace expansion. quantum channels
+\item Process tomography protocols
+\begin{enumerate}
+\item Gate set tomography
+\end{enumerate}
+\end{enumerate}
+
+\subsection{Quasiprobability decomposition}
+\subsubsection{Motivation}
+\subsubsection{Theory}
+Utility of ``twirling'' operations in minimizing the cost\footnote{Error Mitigation for Short-Depth Quantum Circuits, K. Temme, S. Bravyi, and J. M. Gambetta, Phys. Rev. Lett. 119, 180509}.
+For the extrapolation method, their optimisation is to observe that typically for the classes of noise most common in experiments it is appropriate to assume that the expected values of the observation will decay exponentially with he severity of the circuit noise, rather than polynomial.
+
+\subsubsection{Experiment}
+\subsubsection{Summary}
+
+\subsection{Process tomography protocols}
+Localized Markovian errors
+\subsubsection{Motivation}
+\subsubsection{Theory}
+Single-qubit Clifford gates and measurements are universal in  computing expectation values.
+Any quantum operation is a linear map.
+Single qubit Clifford gates and measurements yield a complete set of linear independent maps.
+Any error can be simulated or subtracted by decomposition of the error using complete operation set.
+
+By combining GST and the complete set decomposition, any localized Markovian errors in the QC can be systematically mitigated, 
+so that the error in the final computational output is due to unbiased statistical fluctuation.
+
+\subsubsection{Experiment}
+\subsubsection{Summary}
+
+\section{Summary}
+\begin{enumerate}
+\item {Error mitigation method}
+\item {Applicable error type}
+\item {Efficiency}
+\item {Cost (per qubit)}
+\end{enumerate}
+\end{document}  
