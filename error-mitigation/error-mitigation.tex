@@ -6,6 +6,7 @@
 \usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
 								% TeX will automatically convert eps --> pdf in pdflatex		
 \usepackage{amssymb}
+\usepackage{amsmath}
 \usepackage{braket}
 %SetFonts
 
@@ -41,6 +42,173 @@ Extrinsic SPAM errors are those due to errors in the gates used to transform the
 
 Intrinsic SPAM errors are of particular relevance to fault-tolerant quantum computing, since it turns out that quantum error correction (QEC) requirements are much more stringent on gates than on SPAM. 
 
+\begin{enumerate}
+\item Dephasing
+\item Amplitude and phasing damping
+\item Homogeneous depolarizing
+\end{enumerate}
+
+\begin{enumerate}
+\item Localized Markovian
+\item Unbiased statistical fluctuation
+\end{enumerate}
+
+Below are some concrete examples of quantum noise and quantum operations. 
+They are also important in understanding the practical effects of noise on quantum systems, and how noise can be controlled by techniques such as error-correction.
+
+Quantum operations can be represented in the operator-sum representation:
+\begin{equation}
+\mathcal{E} (\rho) = \sum_k E_k \rho E^{\dagger}_k, 
+\end{equation}
+where the operators \{$E_k$\} are known as operation elements.
+
+\subsection{Depolarizing}
+Imagine we take a single qubit, and with probability $p$ that qubit is depolarized. 
+That is, it is replaced by the completely mixed state, $I /2$. With probability $1-p$ the qubit is left untouched. 
+The state of the quantum system after this noise is:
+\begin{equation}
+\mathcal{E} (\rho) = \frac{p I}{2} + (1-p) \rho
+%\sqrt{p} I, \sqrt{1-p} Z
+\end{equation}
+In the operator-sum representation, 
+\begin{equation}
+\mathcal{E} (\rho) =\left({1 - \frac{3p}{4}} \right) \rho + \frac{p}{4} (X \rho X + Y \rho Y + Z \rho X)
+%\sqrt{1 - \frac{3p}{4}} I
+\end{equation}
+
+\subsection{Amplitude damping}
+the description of energy dissipation-effects due to loss of energy from a quantum system.
+\begin{equation}
+\mathcal{E} (\rho) = E_0 \rho E^{\dagger}_0 + E_1 \rho E^{\dagger}_1
+\end{equation}
+where 
+\begin{equation}
+E_0 = 
+\begin{bmatrix}
+1 & 0 \\
+0 & \sqrt{1 - \gamma}
+\end{bmatrix}, 
+\end{equation}
+\begin{equation}
+E_1 = 
+\begin{bmatrix}
+0 & \sqrt{\gamma} \\
+0 & 0
+\end{bmatrix}.
+\end{equation}
+$\gamma$ can be thought of as the probability of losing energy.
+The $E_1$ operation changes a $\ket{1}$ state into a $\ket{0}$ state, corresponding to the physical process of losing a quantum of energy to the environment. 
+$E_0$ leaves $\ket{0}$ unchanged, but reduces the amplitude of a $\ket{1}$ state; 
+physically, this happens because a quantum of energy was not lost to the environment, and thus the environment now perceives it to be more likely that the system is in the $\ket{0}$  state, rather than the $\ket{1}$ state.
+
+$\mathcal{E}_{\textrm{GAD}}$, called generalized amplitude damping, is defined for single qubits by the operation elements
+\begin{equation}
+E_0 = \sqrt{p}
+\begin{bmatrix}
+1 & 0 \\
+0 & \sqrt{1 - \gamma}
+\end{bmatrix}, 
+\end{equation}
+\begin{equation}
+E_1 = \sqrt{p}
+\begin{bmatrix}
+0 & \sqrt{\gamma} \\
+0 & 0
+\end{bmatrix},
+\end{equation}
+\begin{equation}
+E_2 = \sqrt{1-p}
+\begin{bmatrix}
+\sqrt{1 - \gamma} & 0 \\
+0 & 1
+\end{bmatrix},
+\end{equation}
+\begin{equation}
+E_3 = \sqrt{1-p}
+\begin{bmatrix}
+0 &0 \\
+\sqrt{\gamma} & 0
+\end{bmatrix}.
+\end{equation}
+where the stationary state $\rho_{\infty}$, which statisfies $\mathcal{E}_{\textrm{GAD}} (\rho_{\infty}) = \rho_{\infty}$ is,
+\begin{equation}
+\rho_{\infty} = 
+\begin{bmatrix}
+p &0 \\
+0 & 1-p
+\end{bmatrix}.
+\end{equation}
+When $\gamma$ is replaced with a time-varying function like $1-e^{t/T_1}$, you can visualize the effects of amplitude damping as a flow on the Bloch sphere, which moves every point in the unit ball towards a fixed point at $\ket{0}$.
+
+\subsection{Phase damping}
+A noise process that is uniquely quantum mechanical, which describes the loss of quantum information without loss of energy, is phase damping. 
+The energy eigenstates of a quantum system do not change as a function of time, but do accumulate a phase which is proportional to the eigenvalue. 
+When a system evolves for an amount of time which is not precisely known, partial information about this quantum phase -- the relative phases between the energy eigenstates -- is lost.
+A phase kick, the angle of rotation $\theta$ is random. 
+The randomness could originate, for example, from a deterministic interaction with an environment, which never again interacts with the system and thus is implicitly measured.
+Let us assume that the phase kick angle $\theta$ is well represented as a random variable which has a Gaussian distribution 
+$e^{- \theta^2/4 \lambda}$ 
+with mean 0 and variance $2 \lambda$.
+
+The random phase kicking causes the expected value of the off-diagonal elements of the density matrix to decay exponentially to zero with time, $e^{- \lambda}$. 
+That is a characteristic result of phase damping.
+
+\begin{equation}
+\mathcal{E} (\rho) = E_0 \rho E^{\dagger}_0 + E_1 \rho E^{\dagger}_1
+\end{equation}
+where 
+\begin{equation}
+E_0 = 
+\begin{bmatrix}
+1 & 0 \\
+0 & \sqrt{1 - \gamma}
+\end{bmatrix}, 
+\end{equation}
+\begin{equation}
+E_1 = 
+\begin{bmatrix}
+0 & 0 \\
+0 & \sqrt{\gamma}
+\end{bmatrix}.
+\end{equation}
+
+By applying the unitary freedom of quantum operations, we find that a unitary recombination of $E_0$ and $E_1$ gives a new set of operation elements for phase damping;
+\begin{equation}
+E^{\prime}_0 = \sqrt{\alpha} I
+\end{equation}
+\begin{equation}
+E^{\prime}_1 = \sqrt{1-\alpha} Z,
+\end{equation}
+where $\alpha = (1 + \sqrt{1-\lambda})/2$.
+Thus the phase damping quantum operation is exactly the same as the phase flip channel.
+
+Phase damping is often referred to as a $T_2$ relaxation process, for historical reasons, where dephasing time is related to $\gamma$ as $e^{-t / 2T_2} = \sqrt{1 - \gamma}$. 
+As a function of time, the amount of damping increases, corresponding to an inwards flow towards $\sigma_z$-axis.
+
+\subsection{Phase flip}
+\begin{equation}
+\mathcal{E} (\rho) = p \rho + (1-p) Z \rho Z 
+%\sqrt{p} I, \sqrt{1-p} Z
+\end{equation}
+
+\subsection{Bit flip}
+The bit flip channel flips the state of a qubit from $\ket{0}$ to $\ket{1}$ (and vice versa) with probability $1-p$. 
+It has operation elements
+
+\begin{equation}
+\mathcal{E} (\rho) = \sqrt{p} I \rho  \sqrt{p} I + \sqrt{1-p} X  \rho \sqrt{1-p} X 
+%\sqrt{p} I, \sqrt{1-p} X
+\end{equation}
+
+\subsection{Bit-phase flip}
+\begin{equation}
+\mathcal{E} (\rho) = \sqrt{p} I \rho  \sqrt{p} I + \sqrt{1-p} X  \rho \sqrt{1-p} Y
+%\sqrt{p} I, \sqrt{1-p} Y
+\end{equation}
+
+\section{Error models}
+The decay time,  ($T_1$) and dephasing time,  ($T_2$) 
+
 \section{Qubit characterization methods}
 Several methods of qubit characterization are currently available\footnote{Introduction to Quantum Gate Set Tomography, D.~Greenbaum, arXiv:1509.02921}. 
 In chronological order of their development, the main techniques are:
@@ -50,6 +218,15 @@ In chronological order of their development, the main techniques are:
 \item randomized benchmarking (RB)
 \item quantum gate set tomography (GST)
 \end{enumerate}
+
+\subsection{Quantum state tomography (QST)}
+
+\subsection{Quantum process tomography (QPT)}
+A quantum operation on a $d$-dimensional quantum system can be completely determined by experimentally measuring the output density matrices produced from $d^2$ pure state inputs.
+
+\subsection{Randomized benchmarking (RB)}
+
+\subsection{Quantum gate set tomography (GST)}
 
 GST arose from the observation that QPT is inaccurate in the presence of SPAM errors. 
 In QPT, the starting states must form an informationally complete basis of the Hilbert-Schmidt space on which the gate being estimated acts. 
@@ -100,19 +277,7 @@ quantum gate set tomography &  &  &  &
 \end{tabular}
 \end{table}
 
-\begin{enumerate}
-\item Dephasing
-\item Amplitude and phasing damping
-\item Homogeneous depolarizing
-\end{enumerate}
 
-\begin{enumerate}
-\item Localized Markovian
-\item Unbiased statistical fluctuation
-\end{enumerate}
-
-\section{Error models}
-The decay time,  ($T_1$) and dephasing time,  ($T_2$) 
 
 \section{Type of error mitigation technics}
 %\subsection{}
