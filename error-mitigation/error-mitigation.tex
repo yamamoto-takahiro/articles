@@ -27,7 +27,7 @@ Qubit operations are susceptible to various types of errors due to imperfect con
 \item intrinsic
 \item extrinsic
 \end{enumerate}
-\item Gate
+\item Gate infidelity
 \begin{enumerate}
 \item {1 qubit operation}
 \item {2 qubit operation}
@@ -266,7 +266,7 @@ As a result, these techniques will foreseeably be limited to addressing no more 
 GST and RB may end up complementing each other as elements of a larger characterization protocol for any future multi-qubit quantum computer.
 
 TODO: summarize them in table.
-\begin{table}[]
+\begin{table}[h]
 \begin{tabular}{l | l | l | l | l}
 method & assumption & advantage & disadvantage & scalability \\
 \hline
@@ -277,10 +277,15 @@ quantum gate set tomography &  &  &  &
 \end{tabular}
 \end{table}
 
-
-
 \section{Type of error mitigation technics}
-%\subsection{}
+There are four types of errors that can result in infidelity in the variational quantum simulation: 
+\begin{enumerate}
+\item errors due to limited generality of the trial wave function, which may only be able to describe the simulated system approximately; 
+\item shot noise (TODO: definition) in measurments 
+\item errors due to noise in the quantum machine, e.g., decoherence and quantum gate infidelity.
+\end{enumerate}
+
+Type of error mitigation technics are listed as:
 \begin{enumerate}
 \item Error extrapolation
 \item Quasiprobability decomposition
@@ -290,6 +295,92 @@ quantum gate set tomography &  &  &  &
 \item Gate set tomography
 \end{enumerate}
 \end{enumerate}
+
+\subsection{Homogeneous and inhomogeneous scaling}
+%\subsubsection{Motivation}
+\subsubsection{Theory}
+Consider the case in which the effect of machine noise is to depolarize the ancillary qubit at a fixed level; \textit{i.e.}, the output of the quantum computer becomes 
+$\left< X \right> = \eta \left< X \right>^{(0)}$, 
+where $\eta$ is a constant independent of the quantum circuit. 
+%In this case, all equation coefficients are scaled as 
+
+An example of the homogeneous scaling is the case of balanced measurement errors. 
+Errors in the measurement on the ancillary qubit (see Fig.?) can be modeled as follows: 
+\begin{enumerate}
+\item
+If the state of the qubit is $\ket{0}$ the measurement outcome is correct with the probability $(1-p_0)$ and the outcome is incorrect with the probability $p_0$
+\item
+If the state of the qubit is $\ket{1}$ the measurement outcome is correct with the probability $(1-p_1)$ and the outcome is incorrect with the probability $p_1$
+\end{enumerate}
+
+\begin{figure}[t]
+\includegraphics[width=8cm]{./img/bitflip}
+\centering
+\end{figure}
+
+Then the expectation value is 
+$\left< X \right> = (p_1 - p_0) + (1 - p_0 - p_1) \left< X \right>^{(0)}$, 
+
+If measurement errors are balanced, \textit{i.e.}, $p_0 = p_1$, the effect of measurement errors is a fixed scaling factor 
+$\eta = 1 - p_0 - p_1$, which does not result in computing errors. 
+Therefore, the hybrid algorithm is inherently insensitive to measurement errors on the ancillary qubit if these errors are balanced. 
+Note also that if single-qubit gates are reliable, one can flip the qubit before the measurement so that measurement errors are effectively balanced.
+Measurement errors can be corrected even if they are not balanced. 
+If $p_0$ and $p_1$ can be evaluated by benchmarking measurement operations, one can easily work out the true value 
+$\left< X \right>^{(0)}$ using the value obtained from the real machine: 
+$\left< X \right>^{(0)} = [\left< X \right> - (p_1 - p_0)]/(1 - p_0 - p_1)$
+We note that when error probabilities are higher, the denominator is smaller, which means that we need to evaluate $[\left< X \right>$ with a higher accuracy in order to achieve the same accuracy of $\left< X \right>^{(0)}$\footnote{PhysRevX.7.021050}
+
+\subsubsection{Experiment}
+\subsubsection{Summary}
+
+\subsection{Error extrapolation}
+\subsubsection{Motivation}
+\subsubsection{Theory}
+Errors in an operation are stochastic if the operation is described by a superoperator $\mathcal{N} \mathcal{U}$ and $\mathcal{N}$ has the form 
+$\mathcal{N} = (1 - \epsilon) \mathcal{I} + \mathcal{E}$. 
+Here, $\mathcal{U}$ is the ideal operation without errors, $\mathcal{N}$ is the superoperator describing the effect of the noise, $\mathcal{I}$ is an identity operation, and errors $\mathcal{E}$ occur with the probability $\epsilon$. 
+Here, $\mathcal{E}$ is a valid quantum operation, \textit{i.e.}, trace-preserving completely positive map.
+
+Given an initial state $\rho$, after a sequence of operations, the final state of the quantum computer is
+$\rho = \mathcal{N}_L \mathcal{U}_L \cdots \mathcal{N}_{\ell} \mathcal{U}_{\ell} \cdots \mathcal{N}_1 \mathcal{U}_1 \rho$
+
+where $\mathcal{N}_{\ell} \mathcal{U}_{\ell}$ denotes the $\ell$-th operation. 
+Taking into account the fact that errors are stochastic, the outcome can be rewritten in the form
+\begin{equation}
+\left< X \right> = \left(1 - r \sum \epsilon_{\ell} \right) \left< X \right>^{(0)} + r  \left< X \right>^{(1)} + \mathcal{O}(r^2),
+\end{equation}
+where $r$ is a convenient scale factor. 
+For more detailed discussion see [PhysRevX.7.021050].
+If probabilities of errors are tunable, we can infer the value of $\left< X \right>^{(0)}$ by measuring values of $\left< X \right>$ of a set of
+different factors $r$ [see Fig.?]. 
+
+To infer the value of $\left< X \right>^{(0)}$, first, we take $N_X$ values of $r$ and measure $\left< X \right>$ with $r_1, \cdots, r_X$ , where
+we can take $r_1 = 1$. 
+Then, we fit the output as $\left< X \right> (r) = \left< X \right>^{(0)} + \chi r$ and obtain the value of $\left< X \right>^{(0)}$.
+In this way, the first-order contribution of machine noise can be corrected. 
+Similarly, by considering second-order terms in the expansion Eq.?, we can fit data using a function with second-order terms.
+
+Using the extrapolation, we can reduce the effect of the machine noise. 
+However, the final estimation of $\left< X \right>^{(0)}$ may still be different from its actual value, and the error in the extrapolation depends on the shot noise in estimating each $\left< X \right> (r)$.
+
+\begin{figure}[t]
+\includegraphics[width=8cm]{./img/PRX7_021050}
+\centering
+\end{figure}
+
+The error-reduction protocol only works for small-size circuits, which are used in the hybrid algorithm, while the Trotterization algorithm usually needs large-size circuits. 
+The true value $\left< X \right>^{(0)}$ can be inferred when the contribution of high-order terms is much smaller than the contribution of lower-order terms.
+
+The total rate of errors in the circuit with $N_g$ gates is approximately $1 - (1 - \epsilon)^{N_g} = N_g \epsilon + (N_g \epsilon)^2 / 2 + \cdots$.
+
+When there are too many gates in the circuit or the error rate is too high,$N_g \epsilon \gtrapprox 1$, the quantum state will be populated with errors, and one cannot retrieve the true value $\left< X \right>^{(0)}$ even if we consider high-order terms in the interpolation.
+
+\subsubsection{Experiment}
+\subsubsection{Summary}
+
+\subsection{Error twirling}
+TODO: fill in
 
 \subsection{Quasiprobability decomposition}
 \subsubsection{Motivation}
@@ -322,4 +413,30 @@ so that the error in the final computational output is due to unbiased statistic
 \item {Efficiency}
 \item {Cost (per qubit)}
 \end{enumerate}
+
+\appendix
+\section{Topological QC}
+Fault-tolerant quantum computing can be achieved by encoding qubits in non-Abelian anyons in topological materials\footnote{A. Kitaev, Fault-Tolerant Quantum Computation by Anyons, Ann. Phys. (Amsterdam) 303, 2 (2003).}
+
+\section{Quantum error correction}
+However, quantum error correction involves a substantial multiplication of resources; the number of physical qubits required may be orders of magnitude greater than the number of error-free logical qubits seen by the algorithm. A recent study audited the cost of implementing Shor’s algorithm to solve a classically infeasible task and found that, even with state-of-the-art techniques for magic-state distillation, the machine would need over six million of today’s highest- quality qubits\footnote{J. O’Gorman and E. T. Campbell, Quantum Computation with Realistic Magic State Factories, Phys. Rev. A 95, 032338 (2017)}.
+% J. O’Gorman and E. T. Campbell, Quantum Computation with Realistic Magic State Factories, Phys. Rev. A 95, 032338 (2017)
+
+\section{Dynamics simulation of  quantum system}
+Dynamics must be studied when properties cannot be determined from static features. 
+This has motivated dynamical versions of many well-known techniques, e.g., nonequilibrium dynamical mean-field theory\footnote{H. Aoki, N. Tsuji, M. Eckstein, M. Kollar, T. Oka, and P. Werner, Nonequilibrium Dynamical Mean-Field Theory and Its Applications, Rev. Mod. Phys. 86, 779 (2014).}, 
+the time-dependent variational quantum Monte Carlo method\footnote{G. Carleo, F. Becca, M. Schiro, and M. Fabrizio, Localization and Glassy Dynamics of Many-Body Quantum Systems, Sci. Rep. 2, 243 (2012).}, 
+time-dependent tensor network methods\footnote{A. J. Daley, C. Kollath, U. Schollwock, and G. Vidal,
+Time-Dependent Density-Matrix Renormalization-Group Using Adaptive Effective Hilbert Spaces, J. Stat. Mech. (2004) P04005., M. C. Banuls, M. B. Hastings, F. Verstraete, and J. I. Cirac, Matrix Product States for Dynamical Simulation of Infinite Chains, Phys. Rev. Lett. 102, 240603 (2009).}, 
+and, of course, time-dependent density functional theory\footnote{E. Runge and E. K. U. Gross, Density-Functional Theory for
+Time-Dependent Systems, Phys. Rev. Lett. 52, 997 (1984).}. 
+
+A new approach\footnote{Ying Li and Simon C. Benjamin, Efficient Variational Quantum Simulator Incorporating Active Error Minimization, Physical Review X 7, 021050 (2017)} is based on the variational method, and our hope is that it could be implemented using small- size quantum circuits, i.e., quantum circuits with a small number of quantum operations that suffer significant noise compared with fault-tolerant quantum computers.
+
+Variational methods have numerous applications in the numerical study of many-body quantum systems: for example, 
+density functional theory\footnote{R. O. Jones, Density Functional Theory: Its Origins, Rise to Prominence, and Future, Rev. Mod. Phys. 87, 897 (2015).}, 
+the matrix product state method\footnote{D. Perez-Garcia, F. Verstraete, M. M. Wolf, and J. I. Cirac, Matrix Product State Representations, Quantum Inf. Comput. 7, 401 (2007).}, 
+and simulating molecular dynamics using the variational principle\footnote{H. Feldmeier and J. Schnack, Molecular Dynamics for
+Fermions, Rev. Mod. Phys. 72, 655 (2000).}
+
 \end{document}  
