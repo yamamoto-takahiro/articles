@@ -6,7 +6,7 @@
 \usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
 								% TeX will automatically convert eps --> pdf in pdflatex		
 \usepackage{amssymb}
-
+\usepackage{amsmath}
 %SetFonts
 
 %SetFonts
@@ -29,6 +29,50 @@
 \subsubsection{Excited state}
 \subsubsection{Ansatz}
 \subsubsection{UCC}
+Calculation  check on Appendix B of [https://arxiv.org/pdf/1805.04340.pdf]
+\begin{align} 
+T_1 &= \sigma_{ij} \theta_{ij} (a^{\dagger}_i a_j - a^{\dagger}_j a_i) \\
+T_2 &= \sigma_{ijkl} \theta_{ijkl} (a^{\dagger}_i a^{\dagger}_j a_k a_l - a^{\dagger}_l a^{\dagger}_k a_j a_i) 
+\end{align}
+After the Jordan-Wigner transformation for $N$ qubits, which is given by:
+\begin{align} 
+a_j &= 1^{\otimes j} \otimes \frac{1}{2} (X + i Y) \otimes Z^{\otimes N - j -1} \\
+a^{\dagger}_j &= 1^{\otimes j} \otimes \frac{1}{2} (X - i Y) \otimes Z^{\otimes N - j -1} 
+\end{align}
+then for $i > j$
+\begin{align} 
+a^{\dagger}_i &= 1^{\otimes j} \otimes 1^{\otimes i-j} \otimes  \frac{1}{2} (X + i Y) \otimes Z^{\otimes N - i -1} \\
+a_j &= 1^{\otimes j} \otimes \frac{1}{2} (X - i Y) \otimes Z^{\otimes i - j} \otimes Z^{\otimes N - i -1}
+\end{align}
+\begin{align} 
+a^{\dagger}_i a_j  
+&= 1^{\otimes j} \otimes \frac{1}{2} (X - i Y) \otimes Z^{\otimes i-j-1} \otimes \frac{1}{2} (X + i Y) Z \otimes 1^{\otimes N - i -1} \\
+&= 1^{\otimes j} \otimes \frac{1}{2} (X - i Y) \otimes Z^{\otimes i-j-1} \otimes \frac{1}{2} (-Y + i X) \otimes 1^{\otimes N - i -1} \\
+a^{\dagger}_j a_i 
+&= 1^{\otimes j} \otimes \frac{1}{2} (X + i Y) \otimes Z^{\otimes i - j-1}  \otimes \frac{1}{2} Z (X - i Y) \otimes 1^{\otimes N - i -1} \\
+&= 1^{\otimes j} \otimes \frac{1}{2} (X + i Y) \otimes Z^{\otimes i-j-1} \otimes \frac{1}{2} (Y + i X) \otimes 1^{\otimes N - i -1} 
+\end{align}
+Then
+\begin{align}
+a^{\dagger}_i a_j - a^{\dagger}_j a_i 
+&= 1^{\otimes j} \otimes  \frac{1}{2} 
+\left[ X \otimes Z^{\otimes i-j-1} \otimes Y - Y \otimes Z^{\otimes i-j-1} \otimes X \right] 
+\otimes 1^{\otimes N - i -1} \\
+& = \frac{i}{2} \bigotimes^{i-1}_{a=j+1} Z_a \left[ Y_j X_i - X_j Y_i  \right] 
+\end{align}
+Since 
+\begin{equation}
+[Y_j X_i, X_j Y_i] = Y_j X_i X_j Y_i - X_j Y_i Y_j X_i = - Z_j Z_i + Z_j Z_i  = 0,
+\end{equation}
+Therefore
+\begin{align}
+\prod_{ij} \exp \left[ \theta_{ij} (a^{\dagger}_i a_j - a^{\dagger}_j a_i) \right] 
+&= \prod_{i > j} \exp \left[ \frac{i}{2} \theta_{ij} \bigotimes^{i-1}_{a=j+1} Z_a  (Y_j X_i - X_j Y_i) \right] \\
+&= \prod_{i>j} 
+\exp \left[ \frac{i}{2} \theta_{ij} \bigotimes^{i-1}_{a=j+1} Z_a  (Y_j X_i) \right] 
+\exp \left[ - \frac{i}{2} \theta_{ij} \bigotimes^{i-1}_{a=j+1} Z_a  (X_j Y_i) \right]
+\end{align}
+
 \subsubsection{Heuristic Ansatz}
 
 \section{non-MO}
