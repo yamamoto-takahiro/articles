@@ -7,6 +7,8 @@
 								% TeX will automatically convert eps --> pdf in pdflatex		
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{braket}
+\usepackage{chemformula}
 %SetFonts
 
 %SetFonts
@@ -21,18 +23,37 @@
 %\subsection{}
 \section{Molecular orbital models}
 \subsection{PEA}
-\subsubsection{Hamiltonian reduction methods}
-\subsubsection{BK-tree}
+\subsection{Hamiltonian reduction methods}
+To address molecular problems on our quantum processor, we rely on a compact encoding of the second- quantized fermionic Hamiltonians on to qubits. 
+
+\subsection{Hydrogen molecule}
+The \ch{H2} molecular Hamiltonian has 4 spin-orbitals, representing the spin-degenerate 1$s$ orbitals of the two Hydrogen atoms. 
+By useing a binary tree encoding [12], the map to a 4 qubit system can be reduced to 2 qubit system due to the spin-parities of the system [9]. 
+% [12] Bravyi, S. & Kitaev, A. Fermionic quantum computation. Ann. Phys. 298, 210–226 (2002).
+% [9] Bravyi, S., Gambetta, J. M., Mezzacapo, A. & Temme, K. Tapering off qubits to simulate fermionic hamiltonians. arXiv preprint arXiv:1701.08213 (2017).
+
+\subsection{Beryllium hydroride molecule}
+The \ch{BeH2} Hamiltonian is defined upon the 1$s$, 2$s$, 2$p_x$ orbitals associated to \ch{Be}, assuming zero filling for the 2$p_y$ and 2$p_z$ orbitals since they do not interact strongly with the subset of orbitals considered, and 1$s$ orbital associated to each \ch{H} atom, for a total of 10 spin orbitals. 
+We then assume perfect filling of the two innermost 1$s$ spin-orbitals of \ch{Be}, after dressing them via the diagonalization of the non-interacting part of the fermionic Hamiltonian. 
+We map the 8 spin-orbital Hamiltonian of \ch{BeH2} spin-orbital Hamiltonian using the parity mapping, and remove, as in the case of \ch{H2}, two qubits associated to the spin-parity symmetries, 
+reducing this to a 6 qubit problem that encodes 8 spin-orbitals. 
+
+\subsection{Lithium hydroride molecule}
+A similar approach is also used to map \ch{LiH} onto 4 qubits. 
+
+The Hamiltonians for \ch{H2}, \ch{LiH} and \ch{BeH2} at their equilibrium distance are explicitly given in the Supplementary Information (TABLE S2) of [arXiv: 1704.05018] and the derivation of them are given at Appendix III.
+
+\subsection{BK-tree}
 
 \subsection{VQE}
 \subsubsection{Ground state}
 \subsubsection{Excited state}
 \subsubsection{Ansatz}
 \subsubsection{UCC}
-Calculation  check on Appendix B of [https://arxiv.org/pdf/1805.04340.pdf]
+Calculation  check on Appendix B of [arXiv: 1805.04340]
 \begin{align} 
-T_1 &= \sigma_{ij} \theta_{ij} (a^{\dagger}_i a_j - a^{\dagger}_j a_i) \\
-T_2 &= \sigma_{ijkl} \theta_{ijkl} (a^{\dagger}_i a^{\dagger}_j a_k a_l - a^{\dagger}_l a^{\dagger}_k a_j a_i) 
+T_1 &= \sum_{ij} \theta_{ij} (a^{\dagger}_i a_j - a^{\dagger}_j a_i) \\
+T_2 &= \sum_{ijkl} \theta_{ijkl} (a^{\dagger}_i a^{\dagger}_j a_k a_l - a^{\dagger}_l a^{\dagger}_k a_j a_i) 
 \end{align}
 After the Jordan-Wigner transformation for $N$ qubits, which is given by:
 \begin{align} 
@@ -73,7 +94,111 @@ Therefore
 \exp \left[ - \frac{i}{2} \theta_{ij} \bigotimes^{i-1}_{a=j+1} Z_a  (X_j Y_i) \right]
 \end{align}
 
+Suppose we choose a set of $(a^{\dagger}_i a_j - a^{\dagger}_j a_i)$ so each of them conserves $s_z$, and the total number of electrons.
+\begin{align}
+\exp \left[ \frac{i}{2} \theta \bigotimes^{i-1}_{a=j+1} Z_a  (Y_j X_i) \right] 
+&= \cos \left( \frac{\theta}{2} \right) 1 + i \sin \left( \frac{\theta}{2} \right) \bigotimes^{i-1}_{a=j+1} Z_a  (Y_j X_i) \\
+\exp \left[ - \frac{i}{2} \theta \bigotimes^{i-1}_{a=j+1} Z_a  (X_j Y_i) \right]
+&= \cos \left( \frac{\theta}{2} \right) 1 - i \sin \left( \frac{\theta}{2} \right) \bigotimes^{i-1}_{a=j+1} Z_a  (X_j Y_i)
+\end{align}
+
+\begin{align}
+\label{eq:uccs}
+\exp \left[ \frac{i}{2} \theta \bigotimes^{i-1}_{a=j+1} Z_a  (Y_j X_i - X_j Y_i) \right] 
+&= \cos^2 \left( \frac{\theta}{2} \right) 1 +  \sin^2 \left( \frac{\theta}{2} \right) (Z_j Z_i) \\
+&+ i \cos  \left( \frac{\theta}{2} \right) \sin \left( \frac{\theta}{2} \right) \bigotimes^{i-1}_{a=j+1} Z_a  (Y_j X_i - X_j Y_i) 
+\end{align}
+Now since $i$ is the index of a virtual orbital and $j$ the index of an occupied orbital, $(Z_j \otimes Z_i)$ on HF state yiels $-1$.
+And also,
+\begin{align}
+\bigotimes^{i-1}_{a=j+1} Z_a Y_j X_i \ket{00\cdots01\cdots11} 
+&= \bigotimes^{i-1}_{a=j+1} Z_a (i Z_j X_j) X_i \ket{00\cdots01\cdots11} \\
+&= i (-)^{n} \ket{0\cdots 1 \cdots01\cdots1 \cdots 1}
+\end{align}
+and 
+\begin{align}
+\bigotimes^{i-1}_{a=j+1} Z_a X_j Y_i \ket{00\cdots01\cdots11} 
+&= \bigotimes^{i-1}_{a=j+1} Z_a X_j (i Z_i X_i) \ket{00\cdots01\cdots11} \\
+&= - i (-)^{n} \ket{0\cdots 1 \cdots01\cdots1 \cdots 1}
+\end{align}
+Thus we can simplify Eq.~\ref{eq:uccs} to obtain
+\begin{align}
+\exp \left[ \frac{i}{2} \theta \bigotimes^{i-1}_{a=j+1} Z_a  (Y_j X_i - X_j Y_i) \right] 
+&= \cos^2 \left( \frac{\theta}{2} \right) 1 -  \sin^2 \left( \frac{\theta}{2} \right) 1 \\
+&+ 2 i \cos  \left( \frac{\theta}{2} \right) \sin \left( \frac{\theta}{2} \right) \bigotimes^{i-1}_{a=j+1} Z_a  (Y_j X_i) \\
+&= \cos (\theta) 1 + i \sin (\theta) \bigotimes^{i-1}_{a=j+1} Z_a  (Y_j X_i) 
+\end{align}
+
+On the contrary, if we were to choose $(i, j)$ are both the indices of occupied or virtual orbitals, we obtain $(Z_j \otimes Z_i) = 1$ and 
+\begin{align}
+\bigotimes^{i-1}_{a=j+1} Z_a X_j Y_i \ket{\mathrm{HF}} 
+= \bigotimes^{i-1}_{a=j+1} Z_a Y_j X_i \ket{\mathrm{HF}}.
+\end{align}
+
+Therefore Eq.~\ref{eq:uccs} becomes
+\begin{equation}
+\exp \left[ \frac{i}{2} \theta \bigotimes^{i-1}_{a=j+1} Z_a  (Y_j X_i - X_j Y_i) \right] 
+= \cos^2 \left( \frac{\theta}{2} \right) 1 +  \sin^2 \left( \frac{\theta}{2} \right) 1
+= 1
+\end{equation}
+
+For UCCD, from the relation $Y \ket{0} = -i \ket{1}$ and $Y \ket{1} = i \ket{0}$, we obtain
+\begin{align}
+X_0 X_1 Y_2 X_3 \ket{0011} &= - i \ket{1100} \\
+Y_0 X_1 Y_2 Y_3 \ket{0011} &= (-i)^2 i \ket{1100} \\
+X_0 Y_1 Y_2 Y_3 \ket{0011} &= (-i)^2 i \ket{1100} \\
+X_0 X_1 X_2 Y_3 \ket{0011} &= - i \ket{1100}
+\end{align}
+and 
+\begin{align}
+Y_0 X_1 X_2 X_3 \ket{0011} &= i \ket{1100} \\
+X_0 Y_1 X_2 X_3 \ket{0011} &= i \ket{1100} \\
+Y_0 Y_1 Y_2 X_3 \ket{0011} &= (-i) i^2 \ket{1100} \\
+Y_0 Y_1 X_2 Y_3 \ket{0011} &= (-i) i^2 \ket{1100}
+\end{align}
+
+In the same token, if we choose $(k, l)$ are both the indices of occupied orbitals and $(i, j)$ the indices of virtual orbitals, 
+\begin{align}
+\left( \bigotimes^{k-1}_{b=l+1} Z_b \bigotimes^{i-1}_{a=j+1} Z_a \right) X_l X_k Y_j X_i \ket{\mathrm{HF}}
+& = \left( \bigotimes^{k-1}_{b=l+1} Z_b \bigotimes^{i-1}_{a=j+1} Z_a \right) Y_l X_k Y_j Y_i \ket{\mathrm{HF}} \\
+& = \left( \bigotimes^{k-1}_{b=l+1} Z_b \bigotimes^{i-1}_{a=j+1} Z_a \right) X_l Y_k Y_j Y_i \ket{\mathrm{HF}} \\
+& = \left( \bigotimes^{k-1}_{b=l+1} Z_b \bigotimes^{i-1}_{a=j+1} Z_a \right) X_l X_k X_j Y_i \ket{\mathrm{HF}} \\
+& = - \left( \bigotimes^{k-1}_{b=l+1} Z_b \bigotimes^{i-1}_{a=j+1} Z_a \right) Y_l X_k X_j X_i \ket{\mathrm{HF}} \\
+& = - \left( \bigotimes^{k-1}_{b=l+1} Z_b \bigotimes^{i-1}_{a=j+1} Z_a \right) X_l Y_k X_j X_i \ket{\mathrm{HF}} \\
+& = - \left( \bigotimes^{k-1}_{b=l+1} Z_b \bigotimes^{i-1}_{a=j+1} Z_a \right) Y_l Y_k Y_j X_i \ket{\mathrm{HF}} \\
+& = - \left( \bigotimes^{k-1}_{b=l+1} Z_b \bigotimes^{i-1}_{a=j+1} Z_a \right) Y_l Y_k X_j Y_i \ket{\mathrm{HF}}
+\end{align}
+and 
+
+\begin{align}
+&\exp \left[ i \frac{\theta}{8} \bigotimes^{k-1}_{b=l+1} Z_b \bigotimes^{i-1}_{a=j+1} Z_a (X_l X_k Y_j X_i + \cdots - Y_l X_k X_j X_i - \cdots) \right] \\
+& = \exp \left[ i \frac{\theta}{2} \bigotimes^{k-1}_{b=l+1} Z_b \bigotimes^{i-1}_{a=j+1} Z_a (X_l X_k Y_j X_i - Y_l X_k X_j X_i) \right] \\
+&= \cos^2 \left( \frac{\theta}{2} \right) 1 + \sin^2 \left( \frac{\theta}{2} \right) (Z_l Z_j) \\
+&+ i \cos \left( \frac{\theta}{2} \right) \sin \left( \frac{\theta}{2} \right) 
+\left( \bigotimes^{k-1}_{b=l+1} Z_b \bigotimes^{i-1}_{a=j+1} Z_a \right) (X_l X_k Y_j X_i - Y_l X_k X_j X_i) \\
+&= \cos (\theta) 1 + i \sin (\theta) \left( \bigotimes^{k-1}_{b=l+1} Z_b \bigotimes^{i-1}_{a=j+1} Z_a \right) X_l X_k Y_j X_i
+\end{align}
+
 \subsubsection{Heuristic Ansatz}
+
+\subsubsection{Circuit building}
+\begin{align}
+S X S^{\dagger} &= Y \\
+H X Y &= Z \\
+H Y H &= -Y \\
+\mathrm{CNOT}_{12} (1 \otimes Z_2) \mathrm{CNOT}_{12} &= Z_1 \otimes Z_2
+\end{align}
+Applying the last relation recursively, we obtain
+\begin{align}
+Z_1 \otimes Z_2 \otimes \cdots \otimes Z_n  
+&= \mathrm{CNOT}_{12} (1 \otimes Z_2 \otimes \cdots \otimes Z_n ) \mathrm{CNOT}_{12} \\
+&= \mathrm{CNOT}_{12} \cdots \mathrm{CNOT}_{(n-1), n} (1 \otimes \cdots \otimes Z_n ) \mathrm{CNOT}_{(n-1), n} \cdots \mathrm{CNOT}_{12} 
+\end{align}
+And using this relation and the fact that $\mathrm{CNOT}^2_{ij} = 1$, we see for instance
+\begin{align}
+\exp \left[ i \frac{\theta}{2} Z_1 \otimes Z_2 \otimes Z_3 \right] 
+= \mathrm{CNOT}_{12} \mathrm{CNOT}_{23} \exp \left( i \frac{\theta}{2} Z_3 \right) \mathrm{CNOT}_{23} \mathrm{CNOT}_{12}
+\end{align}
 
 \section{non-MO}
 
