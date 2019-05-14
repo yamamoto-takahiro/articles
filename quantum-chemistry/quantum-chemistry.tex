@@ -9,6 +9,7 @@
 \usepackage{amsmath}
 \usepackage{braket}
 \usepackage{chemformula}
+\usepackage{siunitx}
 %SetFonts
 
 %SetFonts
@@ -33,15 +34,32 @@ By useing a binary tree encoding [12], the map to a 4 qubit system can be reduce
 % [9] Bravyi, S., Gambetta, J. M., Mezzacapo, A. & Temme, K. Tapering off qubits to simulate fermionic hamiltonians. arXiv preprint arXiv:1701.08213 (2017).
 
 \subsection{Beryllium hydroride molecule}
+In STO-3G basis set, \ch{BeH2} has 7 spatial orbitals and a Hilbert space of dimension $2^{14} = 16384$. 
+By starting with the HF state with two $\alpha$ (spin-up) and two $\beta$ (spin-down) electrons and using only number conserving operators, the relevant subspace to explore has a dimension of 
+$\binom{7}{3} \cdot \binom{7}{3} = 1225$. 
+
+The equilibrium bond length: 1.342 \si{\angstrom} [arXiv: 1812.11173].
+
 The \ch{BeH2} Hamiltonian is defined upon the 1$s$, 2$s$, 2$p_x$ orbitals associated to \ch{Be}, assuming zero filling for the 2$p_y$ and 2$p_z$ orbitals since they do not interact strongly with the subset of orbitals considered, and 1$s$ orbital associated to each \ch{H} atom, for a total of 10 spin orbitals. 
 We then assume perfect filling of the two innermost 1$s$ spin-orbitals of \ch{Be}, after dressing them via the diagonalization of the non-interacting part of the fermionic Hamiltonian. 
 We map the 8 spin-orbital Hamiltonian of \ch{BeH2} spin-orbital Hamiltonian using the parity mapping, and remove, as in the case of \ch{H2}, two qubits associated to the spin-parity symmetries, 
 reducing this to a 6 qubit problem that encodes 8 spin-orbitals. 
 
+
+
 \subsection{Lithium hydroride molecule}
-A similar approach is also used to map \ch{LiH} onto 4 qubits. 
+In STO-3G basis set, \ch{LiH} has 6 spatial orbitals and a Hilbert space of dimension $2^{12} = 4096$. 
+By starting with the HF state with two $\alpha$ (spin-up) and two $\beta$ (spin-down) electrons and using only number conserving operators, the relevant subspace to explore has a dimension of 
+$\binom{6}{2} \cdot \binom{6}{2} = 225$. 
+In this basis, the occupied orbitals are \{1,2\}, and the virtual orbitals are \{3,4,5,6\}.
+
+The equilibrium bond length: 2.39 \si{\angstrom} [arXiv: 1812.11173]
+
+A similar approach described in [arXiv: 1704.05018] is also used to map \ch{LiH} onto 4 qubits. 
 
 The Hamiltonians for \ch{H2}, \ch{LiH} and \ch{BeH2} at their equilibrium distance are explicitly given in the Supplementary Information (TABLE S2) of [arXiv: 1704.05018] and the derivation of them are given at Appendix III.
+
+
 
 \subsection{BK-tree}
 
