@@ -207,7 +207,106 @@ It has operation elements
 \end{equation}
 
 \section{Error models}
+\subsection{Coherence}
 The decay time,  ($T_1$) and dephasing time,  ($T_2$) 
+\begin{equation}
+f(t) = A e^{- t/T_1} + C
+\end{equation}
+for unknown parameters $A$, $C$, and $T_1$. 
+If there are no SPAM errors,  $A = 1$ and $C = 0$.
+Similarly, for $T_2$ and $T^*_2$,  the ground state population is expected to behave like
+\begin{equation}
+f(t) = A e^{- t/T^*_2} \cos( 2\pi f t + \phi ) + C
+\end{equation}
+respectively; both with $A = C = 1/2$ in the lack of SPAM errors.
+
+\subsection{Hamiltonian Characterization}
+Measuring $ZZ$
+perform an experiment to measure $ZZ$ between a pair of qubits. 
+$ZZ$ here is defined as the energy shift on the $\ket{11}$ state,
+\begin{equation}
+H = \frac{\omega_0}{2} (1 - \sigma_{Z, 0}) + \frac{\omega_1}{2} (1 - \sigma_{Z, 1}) + \xi \ket{11} \bra{11}
+%f(t) = A e^{- t/T^*_2} \cos( 2\pi f t + \phi ) + C
+\end{equation}
+The experiment to measure $\xi$ is to perform a Ramsey experiment on Q0 (H-t-H) and repeat the Ramsey with Q1 in the excited state. 
+The difference in frequency between these experiments is the rate $\xi$. 
+ZZ rates are typically $\approx$100kHz so we want Ramsey oscillations around 1MHz.
+12 numbers ranging from 10 to 1000, logarithmically spaced
+%https://github.com/Qiskit/qiskit-tutorials/blob/master/qiskit/ignis/hamiltonian_and_gate_characterization.ipynb
+
+\subsection{Amplitude Error Characterization for Single Qubit Gates}
+Measure the amplitude error in the single qubit gates. 
+Here this measures the error in the $\pi/2$ pulse. 
+Note that we can run multiple amplitude calibrations in parallel. 
+% Here we measure on qubits 2 and 4.
+This shows the sequence of the calibration, which is repeated application of $Y_{\pi}$ ($U_2(0, 0)$). 
+Note that the measurements are mapped to a minimal number of classical registers in order of the qubit list.
+
+Suppose error model where each $Y_{\pi}$ gate has error
+\begin{equation}
+\begin{bmatrix}
+\cos (\theta) & - \sin (\theta) \\
+\sin (\theta) & \cos (\theta)
+\end{bmatrix}.
+\end{equation}
+Excited state population can be fit as:
+\begin{equation}
+C - \frac{1}{2} \cos \left[ \left( \theta + \frac{\pi}{2} \right) (x + 1) \right]
+\end{equation}
+where $x$ is the number of gate repetitions and $\theta$ is the error for the pulse (amplitude/error). [TODO: fill the gap]
+
+\subsection{Angle Error Characterization for Single Qubit Gates}
+Measure the angle between the $X$ and $Y$ gates
+
+Gate sequence for measuring the angle error
+$U_2(0, 0) U_1 (2 \theta) U_2(- \pi/2, \pi/2) U_2(- \pi/2, \pi/2) \cdots$
+
+where the $U_1$ gates are added errors to test the procedure
+
+\subsection{Amplitude Error Characterization for CNOT Gates}
+This looks for a rotation error in the CNOT gate, ie., if the gate is actually $CR_X(\pi/2+\delta)$ measure $\delta$. 
+This is very similar to the single qubit amplitude error calibration except we need to specify a control qubit (which is set to be in state $\ket{1}$) and the rotation is a $\pi$.
+
+Suppose error model where each CNOT gate has error
+\begin{equation}
+\begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & \cos (\theta) & -i  \sin (\theta) \\
+0 & 0 & - i \sin (\theta) & \cos (\theta)
+\end{bmatrix}.
+\end{equation}
+
+
+\begin{equation}
+C + \frac{1}{2} \sin \left[ \left( \theta + \pi\right) x \right]
+\end{equation}
+where $x$ is the number of gate repetitions and $\theta$ is the amplitude error for the pulse.
+See: [https://qiskit.org/documentation/ignis/characterization.html]
+
+\subsection{Angle Error Characterization for CX Gates}
+Measure the angle error $\theta$ in the CNOT gate, i.e., $CR_{\cos(\theta)X+\sin(\theta)Y}(\pi/2)$ with respect to the angle of the single qubit gates.
+
+\subsection{Error models}
+\begin{equation}
+\Lambda(\rho) = \sum_k E_k \rho E^{\dagger}_k
+\end{equation}
+
+\begin{align}
+E_1 &= \frac{1 + \sqrt{1 - \gamma - \lambda}}{2} I + \frac{1 - \sqrt{1 - \gamma - \lambda}}{2} Z \\
+E_2 &= \frac{\sqrt{\gamma}}{2} (X + iY) \\
+E_1 &= \frac{\sqrt{\lambda}}{2} (I - Z)
+\end{align}
+
+\begin{equation}
+\Lambda(\rho) 
+\to \sum_{A \in \mathcal{A}} A^{\dagger} \Lambda(A \rho A^{\dagger}) A
+= \sum_{A \in \mathcal{A}} p_A A^{\dagger} \rho A
+\end{equation}
+
+\begin{equation}
+\mathcal{A} = \{ I, X, Y, Z \}
+\end{equation}
 
 \section{Qubit characterization methods}
 Several methods of qubit characterization are currently available\footnote{Introduction to Quantum Gate Set Tomography, D.~Greenbaum, arXiv:1509.02921}. 
