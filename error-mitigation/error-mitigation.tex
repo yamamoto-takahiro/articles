@@ -207,6 +207,34 @@ It has operation elements
 \end{equation}
 
 \section{Error models}
+The most general form of a single-qubit unitary:
+\begin{equation}
+U (\theta, \phi, \lambda) = 
+\begin{bmatrix}
+\cos (\theta/2) & - e^{i \lambda} \sin (\theta/2) \\
+e^{i \phi} \sin (\theta/2) & e^{i (\lambda + \phi)} \cos (\theta/2)
+\end{bmatrix}, 
+\end{equation}
+It is implemented using three frame changes and two $X_{\pi/2}$ pulses. 
+
+\begin{equation}
+U_1(\lambda) = U (0, 0, \lambda) = 
+\begin{bmatrix}
+1 & 0 \\
+0 & e^{i \lambda}
+\end{bmatrix}, 
+\end{equation}
+
+\begin{equation}
+U_2 (\phi, \lambda) = U (\pi/2, \phi, \lambda) = \frac{1}{\sqrt{2}}
+\begin{bmatrix}
+1 & - e^{i \lambda} \\
+e^{i \phi} & e^{i (\lambda + \phi)}
+\end{bmatrix}, 
+\end{equation}
+ In the IBM Q Experience, this is implemented by a pre- and post-frame change and a $X_{\pi/2}$ pulse
+%https://quantumexperience.ng.bluemix.net/proxy/tutorial/full-user-guide/002-The_Weird_and_Wonderful_World_of_the_Qubit/004-advanced_qubit_gates.html
+
 \subsection{Coherence}
 The decay time,  ($T_1$) and dephasing time,  ($T_2$) 
 \begin{equation}
@@ -239,7 +267,7 @@ Measure the amplitude error in the single qubit gates.
 Here this measures the error in the $\pi/2$ pulse. 
 Note that we can run multiple amplitude calibrations in parallel. 
 % Here we measure on qubits 2 and 4.
-This shows the sequence of the calibration, which is repeated application of $Y_{\pi}$ ($U_2(0, 0)$). 
+This shows the sequence of the calibration, which is repeated application of $Y_{\pi} = e^{i (\pi/2) Y} = U_2(0, 0)$. 
 Note that the measurements are mapped to a minimal number of classical registers in order of the qubit list.
 
 Suppose error model where each $Y_{\pi}$ gate has error
@@ -270,13 +298,10 @@ This is very similar to the single qubit amplitude error calibration except we n
 Suppose error model where each CNOT gate has error
 \begin{equation}
 \begin{bmatrix}
-1 & 0 & 0 & 0 \\
-0 & 1 & 0 & 0 \\
-0 & 0 & \cos (\theta) & -i  \sin (\theta) \\
-0 & 0 & - i \sin (\theta) & \cos (\theta)
+I & O \\
+O & e^{i \theta X}
 \end{bmatrix}.
 \end{equation}
-
 
 \begin{equation}
 C + \frac{1}{2} \sin \left[ \left( \theta + \pi\right) x \right]
@@ -286,6 +311,44 @@ See: [https://qiskit.org/documentation/ignis/characterization.html]
 
 \subsection{Angle Error Characterization for CX Gates}
 Measure the angle error $\theta$ in the CNOT gate, i.e., $CR_{\cos(\theta)X+\sin(\theta)Y}(\pi/2)$ with respect to the angle of the single qubit gates.
+
+\subsection{Measurement Error and Mitigation}
+% https://github.com/Qiskit/qiskit-tutorials/blob/master/community/ignis/measurement_error_mitigation.ipynb
+The last step of a typical quantum experiment is to perform a measurement on the qubits in the circuit. 
+Although the qubit state $\ket{\psi}$ (or more generally the density matrix $\rho$) is the general description of the quantum state, in a typical strong projective measurement our measurement projects the general state into a specific computational state $\ket{x}$ (where $x$ is a bitstring, e.g.,  1001010) The probability of measuring bitstring $x$ is given by: 
+\begin{equation}
+P_x = \mathrm{Tr}(\bra{x} \rho \ket{x})
+\end{equation}
+Therefore, the measurement process is stochastic. 
+The above distribution of $x$ given a state $\rho$ is true only in the absence of measurement errors. 
+There are multiple sources of possible measurement error, all of which are dependent on the physical mechanism of measurement in the system. 
+For superconducting qubits coupled to readout cavities [1,2,3,4,5] the state of the qubit is determined by measurement the response of a microwave tone incident on the readout cavity. The cavity signal is measured for some time where $V(t)$ is the complex amplitude of the signal which is converted to a single complex number based on a measurement kernel 
+\begin{equation}
+V = \int_0^{T} V(t) K(t) dt
+\end{equation}
+which is then turned into a bit by a nonlinear discriminator [6]. 
+The simplest example being if $|V| < V_0$ then the qubit was in state 0 and otherwise the qubit was in state 1.
+
+As discussed in [6] there are classical sources of noise on the signal that lead to misidentification of the qubit state, but it can also happen that the qubit decays due to $T_1$ during the measurement. There are other sources of crosstalk (to numerous to enumerate) such as classical crosstalk on the lines and crosstalk between resonantors on chip. All of these issues lead to a new probability distribution $\tilde{P}_{\rho}$ for a given state. Given certain assumptions about these errors and appropriate calibration we can attempt to correct the skew in the probability distribution on average.
+
+References
+[1] Alexandre Blais, Ren-Shou Huang, Andreas Wallraff, S. M. Girvin, and R. J. Schoelkopf, Cavity quantum electrodynamics for superconducting electrical circuits: An architecture for quantum computation, https://arxiv.org/abs/cond-mat/0402216
+
+[2] Jay Gambetta, Alexandre Blais, D. I. Schuster, A. Wallraff, L. Frunzio, J. Majer, M. H. Devoret, S. M. Girvin, and R. J. Schoelkopf. Qubit-photon interactions in a cavity: Measurement induced dephasing and number splitting https://arxiv.org/abs/cond-mat/0602322
+
+[3] Alexandre Blais, Jay Gambetta, A. Wallraff, D. I. Schuster, S. M. Girvin, M. H. Devoret, and R. J. Schoelkopf. Quantum information processing with circuit quantum electrodynamics. https://arxiv.org/abs/cond-mat/0612038
+
+[4] Jay Gambetta, W. A. Braff, A. Wallraff, S. M. Girvin, R. J. Schoelkopf. Protocols for optimal readout of qubits using a continuous quantum nondemolition measurement. https://arxiv.org/abs/cond-mat/0701078
+
+[5] Jay Gambetta, Alexandre Blais, M. Boissonneault, A. A. Houck, D. I. Schuster and S. M. Girvin. Quantum trajectory approach to circuit QED: Quantum jumps and the Zeno effect. https://arxiv.org/abs/0709.4264
+
+[6] Colm A. Ryan, Blake R. Johnson, Jay M. Gambetta, Jerry M. Chow, Marcus P. da Silva, Oliver E. Dial and Thomas A. Ohki. Tomography via Correlation of Noisy Measurement Records. https://arxiv.org/abs/1310.6448
+
+\subsection{Constructing a Full Calibration Matrix}
+The assumption of the error mitigation technique is that we can prepare each of the basis states with very low error. Given this assumption, in separate experiments we can prepare one of the $2^n$ states and then measure the outputs in all $2^n$ states. Normalizing these outputs and making each set of output probabilities for a given prepared state the columns of a matrix we obtain the matrix $\mathbf{A}$ which translates the ideal probability distribution of the state $\rho$ ($P_\rho$) into the experimental probability distribution $\tilde{P}_{\rho}$ 
+\begin{equation}
+\tilde{P}_{\rho} = \mathbf{A} \cdot P_{\rho}
+\end{equation}
 
 \subsection{Error models}
 \begin{equation}
@@ -324,6 +387,84 @@ In chronological order of their development, the main techniques are:
 A quantum operation on a $d$-dimensional quantum system can be completely determined by experimentally measuring the output density matrices produced from $d^2$ pure state inputs.
 
 \subsection{Randomized benchmarking (RB)}
+
+\subsection{Quantum Volume}
+Quantum Volume (QV) is a single-number metric that can be measured using a concrete protocol on near-term quantum computers of modest size. 
+The QV method quantifies the largest random circuit of equal width and depth that the computer successfully implements. 
+Quantum computing systems with high-fidelity operations, high connectivity, large calibrated gate sets, and circuit rewriting toolchains are expected to have higher quantum volumes.
+
+The Quantum Volume Protocol
+A QV protocol (see [1]) consists of the following steps:
+
+\subsubsection{Step 1: Generate QV sequences}
+It is well-known that quantum algorithms can be expressed as polynomial-sized quantum circuits built from two-qubit unitary gates. 
+Therefore, a model circuit consists of $d$ layers of random permutations of the qubit labels, followed by random two-qubit gates (from $SU(4)$). 
+When the circuit width $m$ is odd, one of the qubits is idle in each layer.
+
+More precisely, a QV circuit with depth $d$ and width $m$, is a sequence $U = U^{(d)} \cdots U^{(2)}U^{(1)}$ of $d$ layers: 
+\begin{equation}
+U^{(t)} = U^{(t)}_{\pi_t(m'-1),\pi_t(m)} \otimes \cdots \otimes U^{(t)}_{\pi_t(1),\pi_t(2)}
+\end{equation}
+ each labeled by times $t = 1 ... d$ and acting on $m' = 2 \lfloor n/2 \rfloor$ qubits. Each layer is specified by choosing a uniformly random permutation $\pi_t \in \mathcal{S}_m$ of the $m$ qubit indices and sampling each $U^{(t)}_{a,b}$, acting on qubits $a$ and $b$, from the Haar measure on $SU(4)$.
+
+% In the following example we have 6 qubits Q0,Q1,Q3,Q5,Q7,Q10. We are going to look at subsets up to the full set (each volume circuit will be depth equal to the number of qubits in the subset)
+
+\subsubsection{Step 2: Simulate the ideal QV circuits}
+The quantum volume method requires that we know the ideal output for each circuit, so we use the statevector simulator in Aer to get the ideal result.
+
+\subsubsection{Step 3: Calculate the heavy outputs}
+To define when a model circuit $U$ has been successfully implemented in practice, we use the heavy output generation problem. The ideal output distribution is 
+$p_U(x) = | \bra{x} U \ket{0} |^2$, where $x \in \{0,1\}^m$ is an observable bit-string.
+
+Consider the set of output probabilities given by the range of $p_U(x)$ sorted in ascending order 
+$p_0 \leq p_1 \leq \dots \leq p_{2^m-1}$. 
+The median of the set of probabilities is  $p_{\mathrm{med}} = (p_{2^{m-1}} + p_{2^{m-1}-1})/2$, and the heavy outputs are 
+\begin{equation}
+H_U = \left\{ x \in \{0,1\}^m \mid p_U(x) > p_{\mathrm{med}} \right\}.
+\end{equation}
+ The heavy output generation problem is to produce a set of output strings such that more than two-thirds are heavy.
+% As an illustration, we print the heavy outputs from various depths and their probabilities (for trial 0):
+
+\subsubsection{Step 4: Define the noise model}
+We define a noise model for the simulator. To simulate decay, we add depolarizing error probabilities to the CNOT and $U$ gates.
+
+\subsubsection{Step 5: Calculate the average gate fidelity}
+The average gate fidelity between the $m$-qubit ideal unitaries $U$ and the executed $U'$ is: 
+\begin{equation}
+F_{\mathrm{avg}}(U,U') = \frac{|\mathrm{Tr}(U^{\dagger}U')|^2/2^m+1}{2^m+1}
+\end{equation}
+
+The observed distribution for an implementation $U'$ of model circuit $U$ is $q_U(x)$, and the probability of sampling a heavy output is: $$ h_U = \sum_{x \in H_U} q_U(x)$$
+%As an illustration, we print the heavy output counts from various depths (for trial 0):
+
+\subsubsection{Step 6: Calculate the achievable depth}
+The probability of observing a heavy output by implementing a randomly selected depth $d$ model circuit is: 
+\begin{equation}
+h_d = \int_U h_U dU
+\end{equation}
+
+The achievable depth $d(m)$ is the largest $d$ such that we are confident that $h_d > 2/3$. 
+In other words, 
+\begin{equation}
+h_1, h_2,\cdots,h_{d(m)} > \frac{2}{3} \text{ and } h_{d(m+1)} \leq \frac{2}{3}
+\end{equation}
+
+We now convert the heavy outputs in the different trials and calculate the mean $h_d$ and the error for plotting the graph.
+
+\subsubsection{Step 7: Calculate the Quantum Volume}
+The quantum volume treats the width and depth of a model circuit with equal importance and measures the largest square-shaped (i.e., $m = d$) model circuit a quantum computer can implement successfully on average.
+
+The quantum volume $V_Q$ is defined as 
+\begin{equation}
+\log_2 V_Q = \arg\max_{m} \min (m, d(m))
+\end{equation}
+We list the statistics for each depth. 
+For each depth we list if the depth was successful or not and with what confidence interval. For a depth to be successful the confidence interval must be $> 97.5 \%$.
+
+References
+[1] Andrew W. Cross, Lev S. Bishop, Sarah Sheldon, Paul D. Nation, and Jay M. Gambetta, Validating quantum computers using randomized model circuits, https://arxiv.org/pdf/1811.12926
+[2] S. Aaronson, L. Chen, Complexity-Theoretic Foundations of Quantum Supremacy Experiments, https://arxiv.org/pdf/1612.05903
+[3] Quantum Supremacy and the Complexity of Random Circuit Sampling, https://arxiv.org/pdf/1803.04402
 
 \subsection{Quantum gate set tomography (GST)}
 
