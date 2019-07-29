@@ -64,17 +64,40 @@ where the operators \{$E_k$\} are known as operation elements.
 
 \subsection{Depolarizing}
 Imagine we take a single qubit, and with probability $p$ that qubit is depolarized. 
-That is, it is replaced by the completely mixed state, $I /2$. With probability $1-p$ the qubit is left untouched. 
+That is, it is replaced by the completely mixed state, $I /2$. With probability $(1-p)$ the qubit is left untouched. 
 The state of the quantum system after this noise is:
 \begin{equation}
 \mathcal{E} (\rho) = \frac{p I}{2} + (1-p) \rho
-%\sqrt{p} I, \sqrt{1-p} Z
 \end{equation}
-In the operator-sum representation, 
+Using the relation
 \begin{equation}
-\mathcal{E} (\rho) =\left({1 - \frac{3p}{4}} \right) \rho + \frac{p}{4} (X \rho X + Y \rho Y + Z \rho X)
-%\sqrt{1 - \frac{3p}{4}} I
+\frac{I}{2} = \frac{\rho + X \rho X + Y \rho Y + Z \rho Z}{4}
 \end{equation}
+we obtain one-qubit depolarizing channel in the operator-sum representation, 
+\begin{equation}
+\mathcal{E} (\rho) =\left({1 - \frac{3p}{4}} \right) \rho + \frac{p}{4} (X \rho X + Y \rho Y + Z \rho Z)
+\end{equation}
+In the same token, for two-qubit depolarizing channel with $l,m$-th qubits
+\begin{equation}
+\mathcal{E} (\rho) = \frac{p I}{4} + (1-p) \rho
+\end{equation}
+and using the relation
+\begin{equation}
+\frac{I}{4} = \sum_{\{i, j\} = \{0, 1, 2, 3 \}} \frac{\sigma^j_l \sigma^i_m \rho \sigma^i_m \sigma^j_l}{16} 
+\end{equation}
+where $\sigma^i_l = \{I, X, Y, Z \}$.
+Thus it can be expressed in the operator-sum representation as
+\begin{equation}
+\mathcal{E} (\rho) =\left({1 - \frac{15p}{16}} \right) \rho + \frac{p}{16}  \sum_{i,j} \sigma^j_l \sigma^i_m \rho \sigma^i_m \sigma^j_l
+\end{equation}
+where $\{i, j\} = \{0, 1, 2, 3 \}$ and $\{i, j\} \ne \{0, 0 \}$.
+
+With $\xi = 3p/4$ for one-qubit and $\xi = 15p/16$ for two-qubit depolarizing channels acting on the system density matrix $\rho$, we achive
+\begin{align}
+\mathcal{E} (\rho) &= \left(1 - \xi \right) \rho + \frac{\xi}{3} \sum_{i=1, 2, 3} \sigma^i \rho \sigma^i \\
+\mathcal{E} (\rho) &= \left(1 - \xi \right) \rho + \frac{\xi}{15} \sum_{i,j} \sigma^j_l \sigma^i_m \rho \sigma^i_m \sigma^j_l
+\end{align}
+where $\{i, j\} = \{0, 1, 2, 3 \}$ and $\{i, j\} \ne \{0, 0 \}$.
 
 \subsection{Amplitude damping}
 the description of energy dissipation-effects due to loss of energy from a quantum system.
@@ -96,10 +119,13 @@ E_1 =
 0 & 0
 \end{bmatrix}.
 \end{equation}
-$\gamma$ can be thought of as the probability of losing energy.
+$\gamma = 1 - e^{- \tau / T_1}$ can be thought of as the probability of losing energy. 
+The typical coherence values for the qubits of $T_1 = 30 \mu$s and $\tau$ of 450 ns for an entangler are used in the simulation in [arXiv: 1704.05018].
+
 The $E_1$ operation changes a $\ket{1}$ state into a $\ket{0}$ state, corresponding to the physical process of losing a quantum of energy to the environment. 
 $E_0$ leaves $\ket{0}$ unchanged, but reduces the amplitude of a $\ket{1}$ state; 
 physically, this happens because a quantum of energy was not lost to the environment, and thus the environment now perceives it to be more likely that the system is in the $\ket{0}$  state, rather than the $\ket{1}$ state.
+The strength of the channels is set by the experimental coherence times and the length of the gates.
 
 $\mathcal{E}_{\textrm{GAD}}$, called generalized amplitude damping, is defined for single qubits by the operation elements
 \begin{equation}
@@ -182,7 +208,11 @@ E^{\prime}_1 = \sqrt{1-\alpha} Z,
 where $\alpha = (1 + \sqrt{1-\lambda})/2$.
 Thus the phase damping quantum operation is exactly the same as the phase flip channel.
 
-Phase damping is often referred to as a $T_2$ relaxation process, for historical reasons, where dephasing time is related to $\gamma$ as $e^{-t / 2T_2} = \sqrt{1 - \gamma}$. 
+Phase damping is often referred to as a $T_2$ relaxation process, for historical reasons, where dephasing time is related to $\gamma$ as 
+$\sqrt{1 - \gamma} = e^{-t / 2T_2} = e^{-t / T_{\phi}}$, where $T_{\phi} = 2 T^*_2 T_1 / (2 T_1 - T^*_2)$.
+% $\gamma = 1 - e^{- \tau / T_1}$ can be thought of as the probability of losing energy. 
+The typical coherence values for the qubits of $T^*_2 = 20 \mu$s and $\tau$ of 450 ns for an entangler are used in the simulation in [arXiv: 1704.05018].
+
 As a function of time, the amount of damping increases, corresponding to an inwards flow towards $\sigma_z$-axis.
 
 \subsection{Phase flip}
@@ -206,6 +236,8 @@ It has operation elements
 %\sqrt{p} I, \sqrt{1-p} Y
 \end{equation}
 
+\section{Unitary 2-design and twirling of quantum channel}
+% twirling_phd_thesis.pdf p.32
 \section{Error models}
 The most general form of a single-qubit unitary:
 \begin{equation}
