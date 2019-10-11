@@ -1,0 +1,160 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{braket}
+%SetFonts
+
+%SetFonts
+
+
+\title{Unitarity}
+\author{Takahiro Yamamoto}
+%\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+\section{Integrating over the unitary group}
+Quantifying the volumes of different types of quantum states with respect to each other is an interesting tool for analysis.
+For example, it is known that the volume of separable states is super-doubly-exponentially small [S. J. Szarek, Phys. Rev. A 72, 032304] with respect to all quantum states. 
+That means that if I choose a state of 100 qubits randomly from Hilbert space, with overwhelming probability that state will be entangled.  
+It also raises the bar for any would-be entanglement witness to beat the performance of an algorithm which guesses entangled for every state blindly if the test set is all possible quantum states.  
+Of course, if you talk to any person working in an experimental quantum lab, they would certainly like it if almost everything they did resulted in an entangled state, unfortunately that’s not really reality, and we know that the set of physical states we expect to see is a tiny subset of all possible states.  
+Coming up with a measure that reflects that reality and readily enables computation would be valuable indeed.
+
+Regardless, one of the tools used in many of these analyses at the moment is integration over the unitary group.  
+This is because the unitary group allows us a way to generate all possible quantum states from some choice of starting state.  
+To complete these analyses one must also integration over the simplices of eigenvalues corresponding to physical states, but for now I want to focus on the unitary group.  
+To talk about integration, we need some way of quantifying volume, or a measure.  
+The unitary group has a natural measure, its unique Haar measure that treats all unitary operators equally.  
+It does this by being invariant under the action of the unitary group, in the same way you wouldn’t want the volume of a box to change if you translated it through space.  
+Mathematically we can phrase this as saying $\mu(V) = \mu(UV) \ \forall \  U,V \in U(N)$, which leads to a corresponding Haar integral with the defining property
+
+\begin{align*} 
+\int_{U(N)} f(UV) d\mu(U) = \int_{U(N)} f(U) d\mu(U) = \int f(U) dU 
+\end{align*}
+
+for any integrable function f, group elements $V,U \in U(N)$, and the last equality is written to match the shorthand commonly found in papers.  
+We should also note that it is convention to fix the normalization of integration over $U(N)$ of the identity to be 1.  
+So that’s all very interesting, but something harder to dig up, is how to actually compute that integral for some actual function f that has been given to you, or you find interesting.  
+I’ll show a few options that I’ve come across or thought about, and if you know some more, I’d love it if you would share them with me.
+
+% Ref:
+% Volume of separable states is super-doubly-exponentially small in the number of qubits
+% Phys. Rev. A 72, 032304
+% https://arxiv.org/abs/quant-ph/0310061
+
+\subsection{Integrating through invariance}
+Some integrals over the unitary group can be done using only the invariance property of the Haar integral given above, and reasoning about what it implies.  
+This is best illustrated through an example.  
+Suppose that $f = UXU^\dagger$, where $\dagger$ indicates Hermitian conjugation, and the integral I am interested in is
+\begin{align*} 
+D(X) = \int_{U(N)} UXU^\dagger dU 
+\end{align*}
+
+Now take any $V \in U(N)$ and start using that integral invariance property as
+\begin{align*} 
+VD(X)V^{\dagger} 
+&= V \left[ \int UXU^\dagger dU \right] V^\dagger \notag \\ 
+&= \int (VU)X(VU)^\dagger dU  \text{ (By integral linearity)} \notag \\ 
+&= \int UXU^\dagger dU  \text{ (By integral invariance)} \notag \\ 
+&= D(X) 
+\end{align*}
+
+Thus we find that $VD(X) = D(X)V$ for all $V \in U(N)$, implying that $D(X) \propto I$.  
+If a matrix is proportional to the identity, then we can characterize it completely by its trace which we then evaluate as
+\begin{align*} 
+\text{Tr}[D(X)] 
+&= \text{Tr} \left[ \int UXU^\dagger dU \right] \notag \\ 
+&= \int \text{Tr} \left( UXU^\dagger \right) dU \text{ (by integral linearity)} \notag \\ 
+&= \int \text{Tr} \left( X \right) dU \text{ (by cyclic invariance of the trace)} \notag \\ 
+&= \text{Tr}(X) 
+\end{align*}
+
+From these two results, we conclude that
+\begin{align*} 
+D(X) = \int_{U(N)} UXU^\dagger dU = \frac{\text{Tr}(X)}{N} I 
+\end{align*}
+which was evaluated entirely through the defining invariance of the integral.
+
+\subsection{Monte Carlo Numerical Integration}
+For some problems of interest, there is no obvious way of integrating it analytically or reaching a closed result.  
+In order to perform a numerical integration, one could choose some parameterization and attempt integration with a quadrature, but this is both cumbersome and often runs out of steam as the dimension of the problem of interest grows.  
+Monte Carlo integration offers a straightforward way to at least attempt these integrations for high-dimensional problems of interest, and is often less human work even for low dimensional problems.  
+Monte Carlo integration is simple, and approximates the integral as
+
+\begin{align*} 
+\int_{U(N)} f(U) dU \approx\frac{1}{M}\sum_{i=1}^M f(U_i) 
+\end{align*}
+
+where $M$ is the number of sample points you take, and $U_i$ is a randomly drawn unitary that is drawn with uniform probability according to the Haar measure.  
+How to draw unitaries uniformly with respect to the Haar measure is not entirely obvious, but luckily this has been worked out, and there are a few ways to do this.  
+One of this requires only 3 simple steps available in most modern math libraries that are
+
+\begin{enumerate}
+\item
+Fill an $N \times N$ matrix with complex Gaussian IID values, call it $Z$.
+\item
+Perform a QR decomposition of the matrix $Z$, define $D$ to be the diagonal of $R$ such that $D_{ii} = R_{ii} / |R_{ii}|$ and 0 otherwise.
+\item
+Set $U_i = Q D$.
+\end{enumerate}
+where $U_i$ is now the unitary of interest randomly distributed according to the Haar measure on $U(N)$.  
+
+\subsection{Weyl’s Integration Formula}
+This formula is a bit of a sledge hammer for hanging a nail, but it exists for all compact Lie groups and for the unitary group takes on the specific form
+
+\begin{align*} 
+&\int_{U(n)} f(A) \ dA \\ 
+&= \frac{1}{(2 \pi)^n n!} \int_{\theta_1=0}^{2 \pi} \int_{\theta_2=0}^{2 \pi} \ldots \int_{\theta_n=0}^{2 \pi} \prod_{j<k} |e^{i \theta_j} - e^{i \theta_k}|^2 f(\theta_1, ..., \theta_n) \ d \theta_1 ...d \theta_n. 
+\end{align*}
+
+This formula also demands that f be a conjugacy invariant function on the unitary group as well as symmetric in its arguments.  
+The $e^{i\theta_j}$ correspond to the possible eigenvalues that characterize all unitary matrices.  
+I’ve yet to use it for a practical calculation, but like having a catalog of known options.
+
+\subsection{Elementwise Integration up to the Second Moment}
+Often, one is interested only in integration of some low-order moment of the Haar distribution, in which case simpler formulas exist.  
+In particular, if the integral depends only on the $k$-th power of the matrix elements of $U$ and $k$-th power of the matrix elements of its complex conjugate $U^*$, then it suffices to consider a $k$-design.  
+Moreover, the explicit formulas for integration take a simple form.  
+In particular, up to the first moment we have
+\begin{align*}
+ \int_{U(N)} dU U_{ij} U^\dagger_{km} = \int_{U(N)} dU U_{ij} U^*_{mk} = \frac{\delta_{im} \delta_{jk}}{N} 
+ \end{align*}
+which can be used to evaluate the same formula we evaluated above through invariance.  
+That is, we seek
+\begin{align*} 
+M = \int dU U \rho U^\dagger. 
+\end{align*}
+which we can evaluate by each element
+\begin{align*} 
+[M]_{im} 
+&= \sum_{j,k} \int dU \ U_{ij} \rho_{jk} U_{km}^\dagger \\ 
+&= \sum_{j,k} \rho_{jk} \int dU \ U_{ij} U_{km}^\dagger \\ 
+&= \sum_{j,k} \rho_{jk} \int dU \ U_{ij} U^*_{mk} \\ 
+&= \sum_{j,k} \rho_{jk} \frac{\delta_{im} \delta_{jk}}{N} \\ 
+&= \sum_{j} \rho_{jj} \frac{\delta_{im}}{N} \\ 
+&= \mathrm{Tr} \rho \frac{\delta_{im}}{N}
+\end{align*}
+using the second delta function we find the full matrix representation of $M$ is given by
+\begin{align*} 
+M = \frac{\mathrm{Tr} \rho}{N} I 
+\end{align*}
+which is the result we obtained above through invariance.  
+Similarly the formula for second order can be expressed simply as
+\begin{align*} 
+& \int dU U_{i_1 j_1} U_{i_2 j_2} U^*_{i'_1 j'_1} U^*_{i'_2 j'_2} = \notag \\ 
+& \frac{\delta_{i_1 i'_1}\delta_{i_2 i'_2}\delta_{j_1 j'_1} \delta_{j_2 j'_2} + \delta_{i_1 i'_2}\delta_{i_2 i'_1}\delta_{j_1 j'_2} \delta_{j_2 j'_1}}{N^2 - 1} - \notag \\ 
+& \frac{\delta_{i_1 i'_1}\delta_{i_2 i'_2}\delta_{j_1 j'_2} \delta_{j_2 j'_1} + \delta_{i_1 i'_2}\delta_{i_2 i'_1}\delta_{j_1 j'_1} \delta_{j_2 j'_2}}{N (N^2 - 1)}. 
+\end{align*}
+
+
+% Symbolic integration with respect to the Haar measure on the unitary group
+% Zbigniew Puchała, Jarosław Adam Miszczak
+% https://arxiv.org/abs/1109.4244
+\end{document}  

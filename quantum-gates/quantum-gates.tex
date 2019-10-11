@@ -1,0 +1,143 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{braket}
+\usepackage{siunitx}
+\usepackage{mathtools}
+%\usepackage{tensor}
+%SetFonts
+
+%SetFonts
+
+
+\title{Note on Quantum Gates}
+\author{Takahiro Yamamoto}
+%\date{}							% Activate to display a given date or no date
+\begin{document}
+\maketitle
+\section{Notations}
+\subsection{Pauli rotation}
+\begin{align}
+R_x(\theta) &= e^{-i \theta X/2} = 
+\begin{bmatrix}
+\cos(\theta/2) & -i \sin(\theta/2) \\
+-i \sin(\theta/2) & \cos(\theta/2)
+\end{bmatrix} \\
+R_y(\theta) &= e^{-i \theta Y/2} = 
+\begin{bmatrix}
+\cos(\theta/2) & -\sin(\theta/2) \\
+\sin(\theta/2) & \cos(\theta/2)
+\end{bmatrix} \\
+R_z(\theta) &= e^{-i \theta Z/2} = 
+\begin{bmatrix}
+e^{-i \theta/2} & 0 \\
+0 & e^{i \theta/2}
+\end{bmatrix}
+\end{align}
+
+\section{CIS and circuit}
+Consider the case where the number of qubits $n$ and the number of electrons $m$.
+The Hartree–Fock (HF) state is $\phi_0 = a^{\dagger}_{m-1} a^{\dagger}_{m-2} \cdots a^{\dagger}_{1} a^{\dagger}_{0} \ket{0^{\otimes n}}$.
+CIS state is $\ket{\psi} = \mu {\ket{\phi_0}} + \sum_{i, j} c_k a^{\dagger}_i a_j \ket{\phi_0}$.
+Here $k$ is assigned in ascending order of the basis set $\{ a^{\dagger}_i a_j \ket{\phi_0} \}$, which is in binary number representation.
+
+We first construct the circuit shown in Fig.~1 to prepare states such that 
+\begin{align}
+\ket{\psi} 
+=&\cos(\theta_0) \ket{\phi_0} + \sin(\theta_0) \cos(\theta_1) a^{\dagger}_m \ket{\phi_0} + \sin(\theta_0) \sin(\theta_1) \cos(\theta_2) a^{\dagger}_{m+1} a^{\dagger}_m \ket{\phi_0}  \\
+& \cdots + \sin(\theta_0) \sin(\theta_1) \dots \sin(\theta_{n-m-1}) a^{\dagger}_{n-1} \cdots a^{\dagger}_{m+1} a^{\dagger}_m \ket{\phi_0} 
+\end{align}
+
+\begin{figure}
+\includegraphics[width=\linewidth]{figs/cis_circuit_01}
+\caption{Circuit}
+\label{fig:cis}
+\end{figure}
+
+Here 
+\begin{align}
+CF^Z_y(\theta) &= (1 \otimes R_y(\theta)) \mathrm{CZ} (1 \otimes R_y(-\theta)) = 
+\begin{bmatrix}
+1 & 0 \\
+0 & R_y(\theta) Z R_y(-\theta)
+\end{bmatrix} \\
+R_y(\theta) Z R_y(-\theta) &= 
+\begin{bmatrix}
+\cos(\theta/2) & -\sin(\theta/2) \\
+\sin(\theta/2) & \cos(\theta/2)
+\end{bmatrix} 
+\begin{bmatrix}
+\cos(-\theta/2) & -\sin(-\theta/2) \\
+-\sin(-\theta/2) & -\cos(-\theta/2)
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+\cos^2(\theta/2) - \sin^2(\theta/2) & 2 \sin(\theta/2) \cos(\theta/2) \\
+2 \sin(\theta/2) \cos(\theta/2) & \sin^2(\theta/2) - \cos^2(\theta/2)
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+\cos(\theta) & \sin(\theta) \\
+\sin(\theta) & -\cos(\theta)
+\end{bmatrix}
+\end{align}
+
+Example: $n=8$, $m=4$. The state we would want to prepare is:
+\begin{align}
+\ket{\psi} 
+=&\cos(\theta_0) \ket{00001111} + \sin(\theta_0) \cos(\theta_1) \ket{00011111} + \sin(\theta_0) \sin(\theta_1) \cos(\theta_2) \ket{00111111}  \\
+&+ \sin(\theta_0) \sin(\theta_1) \sin(\theta_2) \cos(\theta_{3}) \ket{01111111} + \sin(\theta_0) \sin(\theta_1) \sin(\theta_2) \sin(\theta_3) \ket{11111111} 
+\end{align}
+
+\begin{align}
+\ket{00001111} \xRightarrow{R} \cos(\theta_0) \ket{00001111} + \sin(\theta_0) \ket{00011111}
+\end{align}
+
+\begin{align}
+CF^X_y(\theta) &= (1 \otimes R_y(\theta)) \mathrm{CNOT} (1 \otimes R_y(-\theta)) = 
+\begin{bmatrix}
+1 & 0 \\
+0 & R_y(\theta) X R_y(-\theta)
+\end{bmatrix} \\
+R_y(\theta) X R_y(-\theta) &= 
+\begin{bmatrix}
+\cos(\theta/2) & -\sin(\theta/2) \\
+\sin(\theta/2) & \cos(-\theta/2)
+\end{bmatrix} 
+\begin{bmatrix}
+\sin(-\theta/2) & \cos(-\theta/2) \\
+\cos(-\theta/2) & -\sin(-\theta/2)
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+-2 \sin(\theta/2) \cos(\theta/2) & \cos^2(\theta/2) - \sin^2(\theta/2) \\
+- \sin^2(\theta/2) + \cos^2(\theta/2) & 2 \sin(\theta/2) \cos(\theta/2)
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+-\sin(\theta) & \cos(\theta) \\
+\cos(\theta) & \sin(\theta)
+\end{bmatrix}
+\end{align}
+
+\begin{align}
+\mathrm{CNOT}_{21} F_y(\theta_{AB}) (R_y(\theta_0) \otimes I) \ket{00} 
+= 
+\begin{bmatrix}
+X & 0 \\
+0 & I
+\end{bmatrix}
+\begin{bmatrix}
+1 & 0 \\
+0 & R_y(\theta_{AB})
+\end{bmatrix}
+(\cos(\theta_0) \ket{00} + \sin(\theta_0)\ket{01})
+\end{align}
+
+\end{document}  

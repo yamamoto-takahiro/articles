@@ -403,4 +403,18 @@ And using this relation and the fact that $\mathrm{CNOT}^2_{ij} = 1$, we see for
 
 \section{non-MO}
 
+\section{CIS and circuit}
+\begin{align}
+\mathrm{CNOT}_{21} F_y(\theta_{AB}) (R_y(\theta_0) \otimes I) \ket{00} 
+= 
+\begin{bmatrix}
+X & 0 \\
+0 & I
+\end{bmatrix}
+\begin{bmatrix}
+1 & 0 \\
+0 & R_y(\theta_{AB})
+\end{bmatrix}
+(\cos(\theta_0) \ket{00} + \sin(\theta_0)\ket{01})
+\end{align}
 \end{document}  
