@@ -195,12 +195,68 @@ def time_evolution_circuit(g_list, t, kickback_phase, n_trotter_step=1):
     circuit.add_H_gate(a_idx)
     return circuit
 
+def time_evolution_circuit_improved(g_list, t, kickback_phase, k, n_trotter_step=1):
+    n_qubits = 3
+    a_idx = 2
+    phi = -(t / n_trotter_step) * g_list
+    # print(phi)
+    circuit = QuantumCircuit(n_qubits)
+    circuit.add_H_gate(a_idx)
+    # Apply kickback phase rotation to ancilla bit
+    circuit.add_RZ_gate(a_idx, -np.pi*kickback_phase/2)
+    for _ in range(n_trotter_step):
+        for _ in range(2 ** k):
+            # CU(Z0)
+            circuit.add_RZ_gate(0, -phi[0])
+            circuit.add_CNOT_gate(a_idx, 0)
+            circuit.add_RZ_gate(0, phi[0])
+            circuit.add_CNOT_gate(a_idx, 0)
+        
+            # CU(Y0 Y1)
+            circuit.add_S_gate(0)
+            circuit.add_S_gate(1)
+            circuit.add_H_gate(0)
+            circuit.add_H_gate(1)
+            circuit.add_CNOT_gate(1, 0)
+            circuit.add_RZ_gate(0, -phi[1])
+            circuit.add_CNOT_gate(a_idx, 0)
+            circuit.add_RZ_gate(0, phi[1])
+            circuit.add_CNOT_gate(a_idx, 0)
+            circuit.add_CNOT_gate(1, 0)                
+            circuit.add_H_gate(0)
+            circuit.add_H_gate(1)
+            circuit.add_Sdag_gate(0)
+            circuit.add_Sdag_gate(1)
+        
+            # CU(Z1)
+            circuit.add_RZ_gate(1, -phi[2])
+            circuit.add_CNOT_gate(a_idx, 1)
+            circuit.add_RZ_gate(1, phi[2])
+            circuit.add_CNOT_gate(a_idx, 1)
+        
+            # CU(X0 X1)
+            circuit.add_H_gate(0)
+            circuit.add_H_gate(1)
+            circuit.add_CNOT_gate(1, 0)
+            circuit.add_RZ_gate(0, -phi[3])
+            circuit.add_CNOT_gate(a_idx, 0)
+            circuit.add_RZ_gate(0, phi[3])
+            circuit.add_CNOT_gate(a_idx, 0)
+            circuit.add_CNOT_gate(1, 0)     
+            circuit.add_H_gate(0)
+            circuit.add_H_gate(1)
+        
+    circuit.add_H_gate(a_idx)
+    return circuit
+
 def iterative_phase_estimation(g_list, t, n_itter, init_state, n_trotter_step=1, kickback_phase=0.0):
     for k in reversed(range(1, n_itter)):
         psi = init_state.copy()
         phi = kickback_phase/2
-        g_k_list = 2 ** k * np.array(g_list)
-        circuit = time_evolution_circuit(g_k_list, t, kickback_phase, n_trotter_step=n_trotter_step)
+        # g_k_list = 2 ** (k-1) * np.array(g_list)
+        # circuit = time_evolution_circuit(g_k_list, t, kickback_phase, n_trotter_step=n_trotter_step)
+        g_k_list = np.array(g_list)
+        circuit = time_evolution_circuit_improved(g_k_list, t, kickback_phase, k, n_trotter_step=n_trotter_step)
         circuit.update_quantum_state(psi)
         # partial trace
         p0 = psi.get_marginal_probability([2, 2, 0])
@@ -231,14 +287,14 @@ if __name__ == "__main__":
     hf_state = QuantumState(n_qubits)
     hf_state.set_computational_basis(0b001) # |0>|01>
     t = 0.640
-    n_itter = 64 # determine precission
+    n_itter = 16 # determine precission
 
     # validity check    
     _, eigs = reduced_term_hamiltonian()
     e_exact = eigs[0]
     print('e_exact:{}'.format(e_exact))
     print('n, e_matrix, e_iqpe, |e_matrix-e_iqpe|, |e_exact-e_iqpe|')
-    for n in range(1, 50, 2):
+    for n in range(1, 10, 2):
         iqpe_phase = iterative_phase_estimation(g_list, t, n_itter, hf_state, n_trotter_step=n, kickback_phase=0.0)
         e_iqpe = iqpe_phase/t
         _, phases = order_n_trotter_suzuki_approx(t, n)
