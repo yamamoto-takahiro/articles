@@ -41,6 +41,187 @@ e^{-i \theta/2} & 0 \\
 \end{bmatrix}
 \end{align}
 
+\section{Exchange-type gate}
+Efficient Symmetry-Preserving State Preparation Circuits for the Variational Quantum Eigensolver Algorithm
+https://arxiv.org/abs/1904.10910
+
+\begin{equation}
+A(\theta, \phi) = 
+\begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & \cos(\theta) & e^{i \phi} \sin(\theta) & 0 \\
+0 & e^{-i \phi} \sin(\theta) & -\cos(\theta) & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+A(\theta, \phi) = \mathrm{CNOT}_{21} \left(1 \otimes R(\theta, \phi) \right) \mathrm{CNOT}_{12} \left(1 \otimes R^{\dagger}(\theta, \phi) \right) \mathrm{CNOT}_{21},
+\end{equation}
+
+where 
+\begin{equation}
+\mathrm{CNOT}_{21} = 
+\begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & 0 & 0 & 1 \\
+0 & 0 & 1 & 0 \\
+0 & 1 & 0 & 0
+\end{bmatrix}
+\end{equation}
+and 
+\begin{equation}
+R(\theta, \phi) = R_z (\phi + \pi) R_y (\theta + \pi/2) 
+\end{equation}
+
+\begin{align}
+A(\theta, \phi) 
+&= \mathrm{CNOT}_{21} 
+\begin{bmatrix}
+R & 0 \\
+0 & R
+\end{bmatrix}
+\begin{bmatrix}
+1 & 0 \\
+0 & X
+\end{bmatrix}
+\begin{bmatrix}
+R^{\dagger} & 0 \\
+0 & R^{\dagger}
+\end{bmatrix}
+\mathrm{CNOT}_{21} \\
+&= \mathrm{CNOT}_{21} 
+\begin{bmatrix}
+1 & 0 \\
+0 & R X R^{\dagger}
+\end{bmatrix}
+\mathrm{CNOT}_{21} \\
+&= \mathrm{CNOT}_{21}
+\begin{bmatrix}
+1 & 0 \\
+0 & R_z R_y X R^{\dagger}_y R^{\dagger}_z
+\end{bmatrix}
+\mathrm{CNOT}_{21} 
+\end{align}
+
+\begin{align}
+R_y X R^{\dagger}_y
+&= 
+\begin{bmatrix}
+\cos(\theta^{\prime}/2) & -\sin(\theta^{\prime}/2) \\
+\sin(\theta^{\prime}/2) & \cos(\theta^{\prime}/2)
+\end{bmatrix}
+\begin{bmatrix}
+0 & 1 \\
+1 & 0 
+\end{bmatrix}
+\begin{bmatrix}
+\cos(\theta^{\prime}/2) & \sin(\theta^{\prime}/2) \\
+- \sin(\theta^{\prime}/2) & \cos(\theta^{\prime}/2)
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+-2 \sin(\theta^{\prime}/2) \cos(\theta^{\prime}/2) & \cos^2(\theta^{\prime}/2) - \sin^2(\theta^{\prime}/2) \\
+\cos^2(\theta^{\prime}/2) - \sin^2(\theta^{\prime}/2) & 2 \sin(\theta^{\prime}/2) \cos(\theta^{\prime}/2)
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+- \sin(\theta^{\prime}) & \cos(\theta^{\prime}) \\
+\cos(\theta^{\prime}) & \sin(\theta^{\prime})
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+- \sin(\theta + \pi/2) & \cos(\theta + \pi/2) \\
+\cos(\theta + \pi/2) & \sin(\theta + \pi/2)
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+- \cos(\theta) & -\sin(\theta) \\
+-\sin(\theta) & \cos(\theta)
+\end{bmatrix} \\
+\end{align}
+where $\theta^{\prime} = \theta + \pi/2$.
+
+\begin{align}
+R_z (R_y X R^{\dagger}_y) R^{\dagger}_z
+&= 
+\begin{bmatrix}
+e^{-i \phi^{\prime}/2} & 0 \\
+0 & e^{i \phi^{\prime}/2}
+\end{bmatrix}
+\begin{bmatrix}
+- \cos(\theta) & -\sin(\theta) \\
+-\sin(\theta) & \cos(\theta)
+\end{bmatrix}
+\begin{bmatrix}
+e^{i \phi^{\prime}/2} & 0 \\
+0 & e^{-i \phi^{\prime}/2}
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+- \cos(\theta) & -e^{-i \phi^{\prime}} \sin(\theta) \\
+-e^{i \phi^{\prime}} \sin(\theta) & \cos(\theta)
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+- \cos(\theta) & -e^{-i \phi - i \pi} \sin(\theta) \\
+-e^{i \phi + i \pi} \sin(\theta) & \cos(\theta)
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+- \cos(\theta) & e^{-i \phi} \sin(\theta) \\
+e^{i \phi} \sin(\theta) & \cos(\theta)
+\end{bmatrix}
+\end{align}
+where $\phi^{\prime} = \phi + \pi$.
+
+\begin{align}
+A(\theta, \phi) 
+&= \mathrm{CNOT}_{21}
+\begin{bmatrix}
+1 & 0 \\
+0 & R_z R_y X R^{\dagger}_y R^{\dagger}_z
+\end{bmatrix}
+\mathrm{CNOT}_{21} \\
+&=
+\begin{bmatrix}
+1 & 0 & 0 & 0 \\
+0 & \cos(\theta) & e^{i \phi} \sin(\theta) & 0 \\
+0 & e^{-i \phi} \sin(\theta) & -\cos(\theta) & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+\end{align}
+
+\subsection{Definition in Qulacs}
+\begin{equation}
+A(\theta, \phi) = \mathrm{CNOT}_{21} \left(1 \otimes R_y(-\phi - \pi/2) R_z(-\theta - \pi) \right) \mathrm{CNOT}_{12} \left(1 \otimes R_z(\theta + \pi) R_y(\phi + \pi/2) \right) \mathrm{CNOT}_{21},
+\end{equation}
+
+\begin{equation}
+R_z X R^{\dagger}_z
+= 
+\begin{bmatrix}
+0 & e^{i \theta^{\prime}}  \\
+e^{-i \theta^{\prime}}  & 0
+\end{bmatrix}
+= 
+\begin{bmatrix}
+0 & -e^{i \theta}  \\
+-e^{-i \theta}  & 0
+\end{bmatrix}
+\end{equation}
+where $\theta^{\prime} = \theta + \pi$.
+
+\begin{equation}
+R_y (R_z X R^{\dagger}_z) R^{\dagger}_y
+= 
+\begin{bmatrix}
+-\cos(\phi^{\prime}/2) \sin(\phi^{\prime}/2) (e^{i \theta} + e^{-i \theta} ) & -e^{i \theta} \cos^2(\phi^{\prime}/2) + e^{-i \theta} \sin^2(\phi^{\prime}/2) \\
+-e^{-i \theta} \cos^2(\phi^{\prime}/2) + e^{i \theta} \sin^2(\phi^{\prime}/2) & \cos(\phi^{\prime}/2) \sin(\phi^{\prime}/2) (e^{i \theta} + e^{-i \theta} ) 
+\end{bmatrix}
+\end{equation}
+where $\phi^{\prime} = \phi + \pi/2$
+
 \section{CIS and circuit}
 Consider the case where the number of qubits $n$ and the number of electrons $m$.
 The Hartree–Fock (HF) state is $\phi_0 = a^{\dagger}_{m-1} a^{\dagger}_{m-2} \cdots a^{\dagger}_{1} a^{\dagger}_{0} \ket{0^{\otimes n}}$.
