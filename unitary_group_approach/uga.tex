@@ -1,0 +1,48 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{braket}
+\usepackage{siunitx}
+\usepackage{mathtools}
+%\usepackage{tensor}
+%SetFonts
+
+%SetFonts
+
+\title{Unitary Group Approach}
+% Hardware efficient generation of a few particle states based on matrix product state
+\author{Takahiro Yamamoto}
+%\date{}							% Activate to display a given date or no date
+\begin{document}
+
+\maketitle
+\section{Gel'fand-Tsetlin basis}
+Define the composite creation operators $X^{\dagger}_k (n_k)$,
+\begin{equation}
+X^{\dagger}_k (n_k) = 
+\begin{cases}
+I, & \text{if $n_k = 0$} \\
+a^{\dagger}_{k \mu}, &  \text{if $n_k = 1$} \\
+a^{\dagger}_{k \uparrow} a^{\dagger}_{k \downarrow}, &  \text{if $n_k = 2$}.
+\end{cases}
+\end{equation}
+
+The electronic Gel'fand-Tsetlin state is obtained by sequentially coupling the orbital level 0, 1 or 2-particle states,
+
+\begin{equation}
+\ket{\psi} = \sum_{\{ M_k \}} \sum_{\{ \mu_k \}} \prod^n_k \braket{S_{k-1} M_{k-1} s_k \mu_k | S_k M_k} X^{\dagger}_k (n_k) \ket{0},
+\end{equation}
+where $ \ket{0}$ is the physical vacuum state, 
+$\braket{S^{\prime} M^{\prime} S^{\prime \prime} M^{\prime \prime} | S M}$ are the Clebsch-Gordan coefficient,
+$S_k$ are the intermediate spin quantum numbers, and $M_k$ the corresponding magnetic quantum numbers ($s_z$),
+and $s_k = \mu_k = 0$ if $n_k = 0, 2$, while $s_k = 1/2, \mu_k = \pm 1/2$ if $n_k = 1$.
+The summation extends over all $\mu_k$ ($k = 1, 2, \dots ,n$) and $M_k$ ($k = 1, \dots, n-1$)
+while $S_0 = M_0 = 0$, $S_n = S$ , $M_n = M$.
+
+\end{document}  

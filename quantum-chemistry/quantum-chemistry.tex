@@ -417,4 +417,47 @@ X & 0 \\
 \end{bmatrix}
 (\cos(\theta_0) \ket{00} + \sin(\theta_0)\ket{01})
 \end{align}
+
+
+\section{Memoir}
+\subsection{Problem setup}
+For system of 1 orbital (2 spin-orbitals), 1 electron, doublet $(2 S + 1 = 2)$, and $s_z = 1/2$, 
+\begin{equation}
+\ket{\psi} = a^{\dagger}_0 \ket{0}
+\end{equation}
+
+\begin{equation}
+\hat{S}^2 = \frac{3}{4} (a^{\dagger}_0 a_0 + a^{\dagger}_1 a_1) + \frac{3}{2} a^{\dagger}_1 a_1 a^{\dagger}_0 a_0
+\end{equation}
+where $a_i$'s act on Fock state.
+
+\subsection{BK transformation}
+\begin{align}
+a^{\dagger}_0 &\to \frac{1}{2} (X_0 - i Y_0) \\
+a^{\dagger}_0 a_0 &\to \frac{1}{2} (1 - Z_0) \\
+a^{\dagger}_1 &\to \frac{1}{2} (Z_0 X_1 - i Y_1) \\
+a^{\dagger}_1 a_1 &\to \frac{1}{2} (1 - Z_0 Z_1) \\
+\hat{S}^2 &\to \frac{3}{8} (1 - Z_1) 
+\end{align}
+
+Now we calculate
+\begin{equation}
+\bra{\psi} \hat{S}^2 \ket{\psi} 
+= \bra{0} a_0 \hat{S}^2 a^{\dagger}_0 \ket{0}
+= s (s + 1)
+\end{equation}
+in two ways:
+
+\begin{align}
+a_0 \hat{S}^2 a^{\dagger}_0 
+&= \frac{3}{4} (1 - a^{\dagger}_0 a_0 - a^{\dagger}_1 a_1 - a^{\dagger}_1 a^{\dagger}_0 a_1 a_0) \\
+&\to \frac{3}{16} (1 + Z_0 + Z_1 + Z_0 Z_1)
+\end{align}
+while
+\begin{align}
+a_0 \hat{S}^2 a^{\dagger}_0 
+&\to \left[ \frac{1}{2} (X_0 + i Y_0) \right] \left[ \frac{3}{8} (1 - Z_1) \right] \left[ \frac{1}{2} (X_0 - i Y_0) \right] \\
+&= \frac{3}{16} (1 - Z_0 - Z_1 + Z_0 Z_1)
+\end{align}
+
 \end{document}  

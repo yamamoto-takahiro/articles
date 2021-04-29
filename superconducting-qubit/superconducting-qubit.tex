@@ -1,0 +1,614 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{braket}
+%SetFonts
+
+%SetFonts
+
+
+\title{Superconducting qubit}
+\author{Takahiro Yamamoto}
+%\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+\section{Transmon qubit}
+\subsection{Linear LC circuit}
+In a simple LC resonant circuit both the inductor L and the capacitor C are linear circuit elements. 
+Classical Hamiltonian of an electrical LC circuit is
+
+\begin{equation*} 
+H = \frac{Q^2}{2 C} + \frac{\Phi^2}{2 L}
+\end{equation*}
+
+Defining the reduced flux 
+\begin{equation*} 
+\phi = 2 \pi \frac{\Phi}{\Phi_0}
+\end{equation*}
+and the reduced charge 
+\begin{equation*} 
+n = \frac{Q}{2 e},
+\end{equation*}
+we can write down the following quantum-mechanical Hamiltonian for the circuit
+\begin{equation*} 
+H = 4 E_C n^2 + \frac{1}{2} E_L \phi^2,
+\end{equation*}
+where 
+\begin{equation*} 
+E_C = \frac{e^2}{2 C} 
+\end{equation*}
+is the charging energy required to add ``each'' electron of the Cooper-pair to the island and 
+\begin{equation*} 
+E_L = \frac{\Phi^2_0}{4 \pi^2 L} 
+\end{equation*}
+is the inductive energy, where 
+\begin{equation*} 
+\Phi_0 = \frac{h}{2e}
+\end{equation*}
+is the superconducting magnetic flux quantum. 
+Moreover, the quantum operator $n$ is the excess number of Cooper-pairs on the island, 
+and $\phi$--the reduced flux--is denoted the ``gauge-invariant phase'' across the inductor. 
+(TODO: what is it?)
+
+Note that this Hamiltonian is analogous to that of a mechanical harmonic oscillator, with mass 
+$m = C$ 
+and resonant frequency 
+$\omega = \sqrt{LC}$, 
+which expressed in position, $x$, and momentum, $p$, coordinates takes the form 
+
+\begin{equation*} 
+H = \frac{p^2}{2 m} + \frac{m \omega^2 x^2}{2}
+\end{equation*}
+
+
+The Hamiltonian in Eq is identical to the one describing a particle in a one-dimensional quadratic potential, a quantum harmonic oscillator (QHO). 
+We can treat $\phi$ as the generalized position coordinate, so that the first term is the kinetic energy and the second term is the potential energy. 
+
+We emphasize that the functional form of the potential energy influences the eigensolutions. 
+For example, the fact that this term is quadratic ($U_L \propto \phi^2$) in Eq gives rise to the shape of the potential in Fig. 
+The solution to this eigenvalue problem gives an infinite series of eigenstates 
+$\ket{k}$, ($k = $ 0, 1, 2, $\dots$),
+whose corresponding eigenenergies $E_k$ are all equidistantly spaced, i.e., 
+$E_{k+1} - E_k = \hbar \omega_r$, where
+
+\begin{equation*} 
+\omega_r = \frac{8 E_L E_C}{\hbar} = \frac{1}{\sqrt{LC}}
+\end{equation*}
+
+denotes the resonant frequency of the system.
+
+We may represent these results in a more compact form (second quantization) for the quantum harmonic oscillator (QHO) Hamiltonian
+\begin{equation*} 
+H = \hbar \omega_r \left( a^{\dagger} a + \frac{1}{2} \right), 
+\end{equation*}
+where $a^{\dagger}$ ($a$) is the creation (annihilation) operator of a single excitation of the resonator. 
+The Hamiltonian in Eq. is written as energy. 
+It is, however, often preferred to divide by $\hbar$ so that the expression has units of radian frequency, 
+since we will later resonantly drive transitions at a particular frequency or reference the rate at which two systems interact with one another. 
+Therefore, from here on, $\hbar$ will be omitted.
+
+The original charge number and phase operators can be expressed as 
+\begin{equation*} 
+n = n_{zpf} i (a - a^{\dagger} )
+\end{equation*}
+and
+\begin{equation*} 
+\phi = \phi_{zpf} i (a + a^{\dagger} ),
+\end{equation*}
+where
+\begin{equation*} 
+n_{zpf} = \left( \frac{E_L}{32 E_C} \right)^{1/4}
+\end{equation*}
+and
+\begin{equation*} 
+\phi_{zpf} = \left( \frac{2 E_C}{E_L} \right)^{1/4}
+\end{equation*}
+are the ``zero-point fluctuations'' of the charge and phase variables, respectively. 
+Quantum mechanically, the quantum states are represented as wavefunctions that are generally distributed over a range of values of $n$ and $\phi$ and, consequently, the wavefunctions have nonzero standard deviations. 
+Such wavefunction distributions are referred to as ``quantum fluctuations,'' and they exist, even in the ground state, where they are called zero-point fluctuations.
+
+\subsection{Non-linear LC circuit}
+The linear characteristics of the QHO have a natural limitation in its applications for processing quantum information. 
+Before the system can be used as a qubit, we need to be able to define a computational subspace consisting of only two energy states 
+(usually the two-lowest energy eigenstates) in between which transitions can be driven without also exciting other levels in the system. 
+Since many gate operations, such as single-qubit gates, depend on frequency selectivity, 
+the equidistant level-spacing of the QHO, illustrated in Fig., poses a practical limitation.
+
+To mitigate the problem of unwanted dynamics involving non-computational states, 
+we need to add anharmonicity (or nonlinearity) into our system.
+In short, we require the transition frequencies 
+$\omega^{0 \to 1}_q$
+and 
+$\omega^{1 \to 2}_q$
+be sufficiently different to be individually addressable. 
+(TODO: how different? Give concrete numbers.)
+
+In general, the larger the anharmonicity the better it is. 
+In practice, the amount of anharmonicity sets a limit on how short the pulses used to drive the qubit can be. 
+(TODO: why it is so?)
+
+To introduce the nonlinearity required to modify the harmonic potential, 
+we use the Josephson junction--a nonlinear, dissipationless circuit element that forms the backbone in superconducting circuits. 
+By replacing the linear inductor of the QHO with a Josephson junction(TODO: what is it?), playing the role of a nonlinear inductor, 
+we can modify the functional form of the potential energy. 
+The potential energy of the Josephson junction can be derived from Eq. and the two Josephson relations
+\begin{equation*} 
+I = I_C \sin(\phi),
+\end{equation*}
+\begin{equation*} 
+V = \frac{\hbar}{2 e} \frac{d \phi}{dt},
+\end{equation*}
+resulting in a modified Hamiltonian
+\begin{equation*} 
+H = 4 E_C n^2 - E_J \cos(\phi),
+\end{equation*}
+where
+\begin{equation*} 
+E_C = \frac{e^2}{2 C_{\Sigma}},
+\end{equation*}
+$C_{\Sigma} = C_{s} + C_{J}$ 
+is the total capacitance, including both shunt capacitance $Cs$ and the self-capacitance of the junction $CJ$, and 
+\begin{equation*} 
+E_J = I_c \frac{\Phi}{2 \pi},
+\end{equation*}
+is the Josephson energy, with $I_c$ being the critical current of the junction.
+After introducing the Josephson junction in the circuit, the potential energy no longer takes a manifestly parabolic form (from which the harmonic spectrum originates), but rather features a cosinusoidal form, 
+which makes the energy spectrum nondegenerate. 
+Therefore, the Josephson junction is the key ingredient that makes the oscillator anharmonic and thus allows us to identify a uniquely addressable quantum two-level system.
+
+Once the nonlinearity has been added, the system dynamics is governed by the dominant energy in Eq. (16), reflected in the 
+$E_J/E_C$ ratio. 
+Over time, the superconducting qubit community has converged toward circuit designs with 
+$E_j >> E_C$. 
+In the opposite case when 
+$E_J \leq E_C$ , the qubit becomes highly sensitive to charge noise, 
+which has proven more challenging to mitigate than flux noise, making it very hard to achieve high coherence. 
+Another motivation is that cur- rent technologies allow for more flexibility in engineering the inductive (or potential) part of the Hamiltonian. 
+Therefore, working in the $E_J \leq E_C$ limit, makes the system more sensitive to the change in the potential Hamiltonian. 
+Therefore, we will focus here on the state-of-the-art qubit modalities that fall in the regime 
+$E_J >> E_C$.
+
+To access the $E_J >> E_C$ regime, 
+one preferred approach is to make the charging $E_C$ small by shunting the junction with a large capacitor, (TODO: what is shunt capacitor?)
+$C_S >> C_J$, effectively making the qubit less sensitive to charge noise--a circuit commonly known as the transmon qubit. 
+In this limit, the superconducting phase $\phi$ is a good quantum number, 
+i.e., the spread (or quantum fluctuation) of $\phi$ values represented by the quantum wavefunction is small. 
+The low-energy eigenstates are therefore, to a good approximation, localized states in the potential well. 
+We may gain more insight by expanding the potential term of Eq. (16) into a power series (since $\phi$ is small), that is
+\begin{equation*} 
+E_J \cos(\phi) = \frac{1}{2} E_J \phi^2 - \frac{1}{24} E_J \phi^4 + \mathcal{O}(\phi^6),
+\end{equation*}
+The leading quadratic term alone will result in a QHO. 
+The second term, however, is quartic which modifies the eigensolution and disrupts the otherwise harmonic energy structure. 
+Note that, the negative coefficient of the quartic term indicates that the anharmonicity 
+\begin{equation*} 
+\alpha = \omega^{1 \to 2}_q - \omega^{0 \to 1}_q,
+\end{equation*}
+is negative and its limit in magnitude thus cannot be made arbitrarily large. 
+For the case of the transmon, 
+$\alpha = - E_C$
+is usually designed to be 100–300 MHz, as required to maintain a desirable qubit frequency 
+\begin{equation*} 
+\omega_q = \frac{\sqrt{8 E_J E_C} - E_C}{\hbar} = 3-6 GHz,
+\end{equation*}
+while keeping an energy ratio sufficiently large ($E_J/E_C \geq 50$) to suppress charge sensitivity. 
+Fortunately, the charge sensitivity is exponentially suppressed for an increased $E_J/E_C$, 
+while the reduction in anharmonicity only scales as a weak power law, leading to a workable device.
+
+Including terms up to fourth order and using the QHO eigenbases, 
+the system Hamiltonian resembles that of a Duffing oscillator
+\begin{equation*} 
+H = \omega_q a^{\dagger} a + \frac{\alpha}{2} a^{\dagger} a^{\dagger} a a.
+\end{equation*}
+Since 
+$|\alpha| << \omega_q$, 
+we can see that the transmon qubit is basically a weakly anharmonic oscillator (AHO). 
+If excitation to higher noncomputational states is suppressed over any gate operations, either due to a large enough
+$|\alpha|$ 
+or due to robust control techniques such as the derivative reduction by adiabatic gate (DRAG) pulse, 
+we may effectively treat the AHO as a quantum two-level system, simplifying the Hamiltonian to
+\begin{equation*} 
+H = \omega_q \frac{\sigma_z}{2}.
+\end{equation*}
+However, one should always keep in mind that higher levels physically exist.
+Their influence on the system dynamics should be taken into account when designing the system and its control processes. 
+In fact, there are many cases where the higher levels have proven useful to implement more efficient gate operations.
+
+\section{Gate operation with pulse}
+\subsection{Qubit Drive and the Rotating Wave Approximation}
+https://qiskit.org/textbook/ch-quantum-hardware/transmon-physics.html#6.-Qubit-Drive-and-the-Rotating-Wave-Approximation-
+
+\subsection{DRAG pulse}
+
+\section{Measurement with pulse}
+
+\section{Noise}
+\subsection{Energy (thermal) Relaxation}
+
+\section{Optimizing Microwave Pulses for High-Fidelity Qubit Operations}
+
+\section{Relic}
+Given an initial state $\ket{\psi(0)}$, we can solve this differential equation to determine $\ket{\psi(t)}$ at any time $t$.
+
+For $H$ independent of time, the solution of the Schrodinger equation is
+\begin{equation*} 
+\ket{\psi(t)} = e^{-i H t} \ket{\psi(0)}.
+\end{equation*}
+
+A Hamiltonian acting on $n$ qubits is said to be \textit{efficiently simulated} if for any $t > 0$, $\epsilon > 0$, there is a quantum circuit $U$ consisting of poly($n, t, 1/\epsilon$) gates such that
+\begin{equation*} 
+||U - e^{-iHt}  || < \epsilon.
+\end{equation*}
+
+\begin{equation*} 
+\int dt e^{-i \omega t} \bra{\psi(0)} e^{-i H t} \ket{\psi(0)}
+\end{equation*}
+
+\section{Trotter-Suzuki}
+\section{Quantum walk}
+The quantum walk approach gives optimal complexity as a function of the simulation time $t$, while its performance as a function of the required error $\epsilon$ is worse than PF.
+
+\section{Linear combinations of unitaries}
+We can achieve complexity poly($\log(1/\epsilon)$) by techniques for implementing linear combinations of unitary operators.
+
+Basic idea of LCU is that given the ability to implement 
+\begin{equation*} 
+\textrm{SELECT}(W) = \sum_{j= 0} \ket{j} \! \bra{j} \otimes W_j
+\end{equation*}
+implement $V = \sum \alpha_i W_i$, where each $W_i$ is an easy-to-implement unitary.
+For instance, let $V = W_0 + W_1$,
+\begin{align*} 
+\textrm{SELECT}(W) \ket{+} \ket{\psi} 
+&= \frac{1}{\sqrt{2}} (\ket{0} W_0 + \ket{1} W_1) \ket{\psi} \\
+&= \frac{1}{2} (\ket{+} (W_0 + W_1) + \ket{-} (W_0 - W_1)) \ket{\psi} \\
+&= \frac{1}{2} \ket{+} V \ket{\psi} + \frac{1}{2} \ket{-} (W_0 - W_1)) \ket{\psi},
+\end{align*}
+which is a probabilistic implementation of $V$.
+
+More generally, suppose we can decompose the given Hamiltonian in the form
+
+\begin{equation*} 
+H = \sum^L_{\ell = 1} \alpha_{\ell} H_{\ell},
+\end{equation*}
+where $\alpha_{\ell}$ are some real positive coefficients and $H_{\ell}$ are both unitary and Hermitian.
+This is straightforward if $H$ is $k$-local, since in that case $H$ can be expressed as linear combinations of Pauli operators.
+
+We denote the Taylor series for $e^{-i H t}$ up to time $t$, truncated at order $K$, by
+\begin{align*} 
+\tilde{U}(t) 
+&= \sum^K_{k = 0} \frac{(-iHt)^k}{k!} \\
+&= I + (-it) \sum^L_{\ell = 1} \alpha_{\ell} H_{\ell} + \cdots + \frac{(-it)^K}{K!} \left( \sum^L_{\ell = 1} \alpha_{\ell} H_{\ell} \right)^K \\
+&= \sum^K_{k = 0} \sum^L_{\ell_1 = 1} \cdots \sum^L_{\ell_k = 1} \frac{t^k}{k!} \alpha_{\ell_1} \cdots \alpha_{\ell_k} (-i)^k H_{\ell_1} \cdots H_{\ell_k} \\
+&= \sum^{m-1}_{j = 0} \beta_j V_j
+\end{align*}
+
+Let $B$ be an operator that prepares the state
+\begin{equation*} 
+B \ket{0} = \ket{\beta} = \frac{1}{s} \sum^{m-1}_{j = 0} \sqrt{\beta_j} \ket{j},
+\end{equation*}
+where 
+\begin{align*} 
+s 
+&= \sum^{m-1}_{j = 0} \beta_j \\
+&= \sum^K_{k = 0} \sum^L_{\ell_1 = 1} \cdots \sum^L_{\ell_k = 1} \frac{t^k}{k!} \alpha_{\ell_1} \cdots \alpha_{\ell_k} \\
+&= \sum^K_{k = 0}  \frac{t^k}{k!} \left( \sum^L_{\ell = 1} \alpha_{\ell} \right)^k.
+\end{align*}
+
+Let 
+\begin{equation*} 
+\textrm{SELECT}(V) = \sum^{m-1}_{j = 0} \ket{j} \! \bra{j} \otimes V_j
+\end{equation*}
+and 
+\begin{equation*} 
+W = (B^{\dagger} \otimes I) \textrm{SELECT}(V) (B \otimes I)
+\end{equation*}
+
+Then we have 
+\begin{align*} 
+(\bra{0} \otimes I) W (\ket{0} \otimes \ket{\psi}) 
+&= (\bra{0} \otimes I) B^{\dagger} \textrm{SELECT}(V) B (\ket{0} \otimes \ket{\psi}) \\
+&= \frac{1}{s} \left( \sum^{m-1}_i \sqrt{\beta_i} \bra{i} \otimes I \right) \textrm{SELECT}(V) \left( \sum^{m-1}_j \sqrt{\beta_k} \ket{k} \otimes \ket{\psi} \right) \\
+&= \frac{1}{s} \left( \sum^{m-1}_i \sqrt{\beta_i} \bra{i} \otimes I \right) \left( \sum^{m-1}_{j = 0} \ket{j} \! \bra{j} \otimes V_j \right) \left( \sum^{m-1}_j \sqrt{\beta_k} \ket{k} \otimes \ket{\psi} \right) \\
+&= \frac{1}{s} \sum^{m-1}_{j = 0} \beta_j V_j \ket{\psi} \\
+&= \frac{1}{s} \tilde{U}(t) \ket{\psi}
+\end{align*}
+If we postselect the state $W (\ket{0} \otimes \ket{\psi})$ on having its first register in the state $\ket{\psi}$, we obtain the desired result, with the success probability of approximately $1/s^2$.
+$W$ is called \textit{probabilistic implementation} of $U$ with probability $1/s$, or $W$ \textit{block-encodes} the operator $U/s$.
+
+The action of $W$ on the full space is
+\begin{equation*} 
+W (\ket{0} \otimes \ket{\psi}) = \frac{1}{s} \ket{0} \otimes \tilde{U}(t) \ket{\psi} + \sqrt{1 - \frac{1}{s^2}} \ket{\Phi}
+\end{equation*}
+where subspace of $\ket{\Phi}$ is orthogonal to $\ket{0}$, or
+\begin{equation*}
+(\ket{0} \! \bra{0} \otimes I) \ket{\Phi} = 0
+\end{equation*}
+
+To boost the chance of success, we would like to apply amplitude amplification to $W$. Note however that $\ket{\psi}$, about which we would like to reflect, is unknown.
+Alternatively we can apply the reflection about the subspace $\ket{0}$
+\begin{equation*} 
+R = (I - 2 \ket{0} \! \bra{0}) \otimes I
+\end{equation*}
+Let the projection $P = \ket{0} \! \bra{0}$, we have
+\begin{align*} 
+W R W^{\dagger} R W 
+&= W ((I - 2 P) \otimes I) W^{\dagger} ((I - 2 P) \otimes I) W \\
+&= W W^{\dagger} W - 2 W P W^{\dagger} W - 2 W W^{\dagger} P W + 4 W P W^{\dagger} P W,
+\end{align*}
+hence 
+\begin{align*} 
+(\bra{0} \otimes I) W R W^{\dagger} R W (\ket{0} \otimes I) 
+&= (\bra{0} \otimes I) (-3W + 4 W P W^{\dagger} P W) (\ket{0} \otimes I) 
+\end{align*}
+
+TODO: check
+\begin{enumerate}
+\item
+Is $W^{\dagger} = W^{-1}$?
+\item
+$\bra{0} B^{\dagger} B \ket{0} = 1$, then what is $B^{\dagger} \ket{0}$ ?
+\end{enumerate}
+
+Therefore
+\begin{equation*} 
+(\bra{0} \otimes I) W R W^{\dagger} R W (\ket{0} \otimes \ket{\psi}) 
+= - \frac{3}{s} \tilde{U}(t) \ket{\psi} + \frac{4}{s^3} \tilde{U}(t) \tilde{U}^{\dagger}(t) \tilde{U}(t) \ket{\psi}, 
+\end{equation*}
+which is close to $-(3/s - 4/s^3) \tilde{U}(t)$ since $\tilde{U}(t)$ is close to unitary.
+For the purpose of Hamiltonian simulation, we can choose the parameters such that a single segment of the evolution has the value of $s$, and we repeat the process, called \textit{oblivious amplitude amplification}. 
+More generally, the operation $W R W^{\dagger} R W$ is applied many times to boost the amplitude for success to a value close to unity. 
+LCU can be implemented with complexity $O(1/s)$.
+It is important to note that $U$ is (closed to) unitary for OAA to work.
+
+
+\section{Quantum signal processing}
+Suppose we can decompose the given Hamiltonian in the form
+
+\begin{equation*} 
+H = \sum^L_{\ell = 1} \alpha_{\ell} H_{\ell},
+\end{equation*}
+where $\alpha_{\ell}$ are some real positive coefficients and $H_{\ell}$ are both unitary and Hermitian.
+
+Let 
+\begin{equation*} 
+\textrm{SELECT}(H) = \sum^{L}_{\ell = 1} \ket{\ell} \! \bra{\ell} \otimes H_{\ell}
+\end{equation*}
+and 
+\begin{equation*} 
+\textrm{PREPARE} \ket{0} = \frac{1}{\sqrt{\alpha}} \sum^{L}_{\ell = 1} \sqrt{\alpha_{\ell}} \ket{\ell} = \ket{G},
+\end{equation*}
+where $\alpha = \sum^L_{\ell = 1} \alpha_{\ell}$.
+Then we have
+\begin{align*} 
+(\bra{G} \otimes I) \textrm{SELECT}(H) (\ket{G} \otimes I) 
+&= \left( \frac{1}{\sqrt{\alpha}} \sum^{L}_{j = 1} \sqrt{\alpha_{j}} \bra{j} \otimes I \right) \sum^{L}_{\ell = 1} \ket{\ell} \! \bra{\ell} \otimes H_{\ell} \left( \frac{1}{\sqrt{\alpha}} \sum^{L}_{k = 1} \sqrt{\alpha_{k}} \ket{k} \otimes I \right) \\
+&=  \frac{1}{\alpha} \sum^{L}_{\ell = 1} \alpha_{\ell} H_{\ell} \\
+&=  \frac{1}{\alpha} H
+\end{align*}
+
+Let the spectral decompositions of $H/\alpha$ is
+\begin{equation*} 
+\frac{H}{\alpha} = \sum_{\lambda} \lambda \ket{\lambda} \! \bra{\lambda},
+\end{equation*}
+where the sum runs over all eigenvalues of $H/\alpha$ and $|\lambda| \leq 1$.
+
+The concept of \textit{qubitization} relates the spectral decompositions of $H/\alpha$ and 
+\begin{equation*} 
+\mathcal{W} = \left( (2 \ket{G} \! \bra{G} - I) \otimes I \right) \textrm{SELECT}(H).
+\end{equation*}
+\begin{equation*} 
+\mathcal{R} = \left( (2 \ket{G} \! \bra{G} - I) \otimes I \right)
+\end{equation*}
+
+Theorem 2 of [Low and Chuang 2016] asserts that for each eigenvalue $\lambda \in (-1, 1)$, $\mathcal{W}$ has two corresponding eigenvalues (TODO: proof)
+
+\begin{equation*} 
+\lambda_{\pm} = \mp \sqrt{1 - \lambda^2} - i \lambda = \mp e^{\pm i \arcsin(\lambda)},
+\end{equation*}
+with eigenvectors $\ket{\lambda_{\pm}} = (\ket{G_{\lambda}} \pm i \ket{G^{\perp}_{\lambda}})/\sqrt{2}$, where
+\begin{align*} 
+\ket{G_{\lambda}} &= \ket{G} \otimes \ket{\lambda} \\
+\ket{G^{\perp}_{\lambda}} &= \frac{\lambda \ket{G_{\lambda}} - \textrm{SELECT}(H) \ket{G_{\lambda}}}{\sqrt{1 - \lambda^2}}
+\end{align*}
+(TODO: proof)
+\begin{equation*} 
+\mathcal{W} = e^{i \arccos(\lambda) Y}
+\end{equation*}
+
+To perform Hamiltonian simulation by qubitization, we implement a function of $\theta$ that converts the eigenvalues $\lambda_{\pm}$ of $-iQ$ to the desired phase 
+$e^{-i \lambda t}$, where %namely the Jacobi-Anger expantion
+% \begin{equation*} 
+% e^{-i \sin(\theta) t} = \sum^{\infty}_{k=-\infty} J_k(t) e^{i k \theta}
+% \end{equation*}
+
+\begin{equation*} 
+\theta (\lambda_{\pm}) = \mp \arccos(\lambda)
+\end{equation*}
+We approximate $e^{-i \lambda t}$ with the Jacobi-Anger expansion
+\begin{equation*} 
+e^{-i \cos(z) t} = \sum^{\infty}_{k=-\infty} i^k J_k(t) e^{i k z}
+\end{equation*}
+where $J_k(t)$ are Bessel function of the first kind.
+By identifying $\cos(z) = \lambda$, we obtain
+\begin{align*} 
+e^{-i \lambda t} 
+&= \sum^{\infty}_{k=-\infty} i^k J_k(t) e^{i k \arccos(\lambda)} \\
+&= J_0(t) + 2 \sum^{\infty}_{k=1} (-1)^{k} J_{2k}(t) T_{2k}(\lambda) + 2i \sum^{\infty}_{k=1} (-1)^{k-1} J_{2k-1}(t) T_{2k-1}(\lambda) \\
+&= \mathcal{A}(\lambda) + i \mathcal{C}(\lambda)
+\end{align*}
+where $T_k (x) = \cos(k \arccos(x))$ is the Chebyshev polynomials.
+\begin{equation*} 
+T_k (\lambda) = \cos(k \arccos(\lambda)) = \cos \left( k \left( \frac{\pi}{2} + \theta(\lambda_{\pm}) \right) \right)
+\end{equation*}
+hence 
+\begin{equation*}
+e^{-i \lambda t} = \mathcal{A} \left( \frac{\pi}{2} + \theta(\lambda_{\pm}) \right) + i \mathcal{C} \left( \frac{\pi}{2} + \theta(\lambda_{\pm}) \right)
+\end{equation*}
+
+The QSP algorithm applies a sequence of \textit{phased iterates}. 
+We introduce an additional ancilla qubit and define the operator.
+Given any unitary $V$ with eigenstates $V \ket{\lambda} = e^{i \theta_{\lambda}} \ket{\lambda}$ and 
+\begin{equation*} 
+V_0 = \ket{+} \! \bra{+} \otimes I +  \ket{-} \! \bra{-} \otimes V
+\end{equation*}
+controlled by the single-qubit ancilla register where $X \ket{\pm} = \pm \ket{\pm}$.
+\begin{equation*} 
+V_{\varphi} = (e^{-i \varphi Z/2} \otimes I) V_0 (e^{i \varphi Z/2} \otimes I) 
+\end{equation*}
+
+% \begin{equation*}
+% V_{\phi} = (e^{-i \phi Z/2} \otimes I) (\ket{+} \! \bra{+} \otimes I +  \ket{-} \! \bra{-} \otimes (-iQ)) (e^{-i \phi Z/2} \otimes I)
+% \end{equation*}
+
+To simulate evolution of an initial state $\ket{\psi}$, the QSP algorithm applies $V$ to the state $\ket{+} \otimes \ket{G} \otimes \ket{\psi}$
+\begin{align*} 
+e^{-i \phi Z/2} \ket{+}
+&= e^{-i \phi/2} (\ket{0} + e^{-i \phi/2} \ket{1}) \\
+&= e^{-i \phi/2} /2 (1+e^{-i \phi/2}) \ket{+} + (1-e^{-i \phi/2}) \ket{-} \\
+&= e^{-i \phi/2}  (\cos(\phi/2) \ket{+} + i \sin(\phi/2) \ket{-})
+\end{align*}
+
+\begin{align*} 
+V_{\phi} (\ket{+} \otimes \ket{G} \otimes \ket{\lambda})
+&= (e^{-i \phi Z/2} \otimes I) (\ket{+} \! \bra{+} \otimes I +  \ket{-} \! \bra{-} \otimes (-iQ)) (e^{-i \phi Z/2} \otimes I) (\ket{+} \otimes \ket{G} \otimes \ket{\lambda}) \\
+&= e^{i \phi} (e^{-i \phi Z/2} \otimes I) (\ket{+} \! \bra{+} \otimes I +  \ket{-} \! \bra{-} \otimes (-iQ)) (\cos(\phi/2) \ket{+} + i \sin(\phi/2) \ket{-}) \otimes \ket{G} \otimes \ket{\lambda}) \\
+&=  (e^{-i \phi Z/2} \otimes I) (\cos(\phi/2) \ket{+} + ie^{-i \theta_{\lambda}} \sin(\phi/2) \ket{-}) \otimes \ket{G} \otimes \ket{\lambda}) \\
+&= (\cos(\theta_{\lambda}) \ket{+} + \sin(\theta_{\lambda}) \ket{-}) \otimes \ket{G} \otimes \ket{\lambda})
+\end{align*}
+and post-selects the ancilla register of the output on the $\ket{+} \otimes \ket{G}$.
+
+Consider the sequence,
+\begin{equation*}
+V_{\bar{\varphi}} = V^{\dagger}_{\varphi_Q+\pi} V_{\varphi_{Q-1}} \cdots V^{\dagger}_{\varphi_2+\pi} V_{\varphi_{1}}
+\end{equation*}
+(TODO: add cancellation of phase)
+For each eigenstate $\ket{\lambda}$, we obtain a product of single qubit operators 
+$R_{\varphi_Q} (\theta_{\lambda}) \cdots R_{\varphi_1} (\theta_{\lambda})$
+acting only on the ancilla $\ket{+}$.
+The choice of $\{\varphi_1, \cdots, \varphi_Q \}$ determines the effective single-qubit ancilla operator
+\begin{equation*}
+V_{\bar{\varphi}} = \oplus_{\lambda} \left( \mathcal{A}(\theta_{\lambda}) I + i \mathcal{B}(\theta_{\lambda}) Z + i \mathcal{C}(\theta_{\lambda}) X + i \mathcal{D}(\theta_{\lambda}) Y \right) \otimes \ket{\lambda} \! \bra{\lambda}
+\end{equation*}
+
+\begin{equation*}
+(\bra{G} \otimes \bra{+}) V_{\bar{\varphi}} (\ket{+} \otimes \ket{G}) = \oplus_{\lambda, \pm} 
+\frac{1}{2} \left( \mathcal{A} \left( \frac{\pi}{2} + \theta_{\lambda_{\pm}} \right) I + i \mathcal{C} \left(\frac{\pi}{2} + \theta_{\lambda_{\pm}} \right) X \right) \otimes \ket{\lambda} \! \bra{\lambda}
+\end{equation*}
+
+\begin{align*} 
+V_{\phi} 
+&= (e^{-i \phi Z/2} \otimes I) (\ket{+} \! \bra{+} \otimes I +  \ket{-} \! \bra{-} \otimes (-iQ)) (e^{-i \phi Z/2} \otimes I) \\
+&= \sum_{\nu} e^{i \theta_{\nu}/2} R_{\phi} (\theta_{\nu}) \otimes \ket{\nu} \! \bra{\nu}
+\end{align*}
+where 
+\begin{equation*}
+R_{\phi} (\theta) = e^{-i \theta (\cos\phi X + \sin\phi Y)/2} 
+\end{equation*}
+
+\section{Equations for slides}
+\begin{align*} 
+H \ket{n} &= E_n  \ket{n} \\
+e^{-i H t} \ket{n} &= e^{-i E_n t} \ket{n} = e^{-i \phi_n} \ket{n}
+\end{align*}
+
+\begin{equation*}
+\frac{\tilde{\phi}_n}{2 \pi} = \frac{j_1}{2} + \frac{j_2}{2^2} + \cdots + \frac{j_t}{2^t} = 0.j_1 j_2 \dots j_t
+\end{equation*}
+
+\begin{align*} 
+\ket{\psi} \ket{0}^{\otimes t} \xrightarrow{\textrm{QPE}} \ket{\psi} \ket{\tilde{\phi}_n} = \ket{\psi} \ket{j_1 j_2 \dots j_t}
+\end{align*}
+
+
+\begin{align*} 
+H \ket{\psi} & = \sum_n c_n H \ket{n} = \sum_n c_n E_n  \ket{n} \\
+e^{-i H t} \ket{\psi} &= \sum_n c_n e^{-i E_n t} \ket{n} = \sum_n c_n e^{-i \phi_n} \ket{n}
+\end{align*}
+
+\begin{align*} 
+\ket{+} \ket{n} 
+& \rightarrow \frac{1}{\sqrt{2}} (\ket{0} + e^{-i \phi_n} \ket{1}) \ket{n} \\
+& \rightarrow \frac{1}{2} \left[ (1+e^{-i \phi_n}) \ket{0} + (1-e^{-i \phi_n}) \ket{1} \right] \ket{n} 
+\end{align*}
+
+\begin{align*} 
+\textrm{Prob}(0) &= 1 + \cos(\phi_n) \\
+\textrm{Prob}(1) &= 1 - \cos(\phi_n)
+\end{align*}
+
+\begin{align*} 
+\ket{\psi} &= \sum_n c_n \ket{n} \\
+\ket{+} \ket{\psi} 
+& \rightarrow \frac{1}{\sqrt{2}} \sum_n c_n (\ket{0} + e^{-i \phi_n} \ket{1}) \ket{n} \\
+& \rightarrow \frac{1}{2} \sum_n c_n \left[ (1+e^{-i \phi_n}) \ket{0} + (1-e^{-i \phi_n}) \ket{1} \right] \ket{n} 
+\end{align*}
+
+
+\begin{equation*}
+U(t) = e^{-iHt}
+\end{equation*}
+\begin{equation*}
+e^{-iHt} = \left( \prod^L_{\ell=1} e^{-i \alpha_{\ell} H_{\ell} t/\rho} \right)^{\rho}
+\end{equation*}
+
+\begin{equation*}
+e^{A} e^{B} = e^{A + B + \frac{1}{2} [A, B] + \frac{1}{2} [A, [A, B]] + \frac{1}{2} [B, [B, A]] + \cdots}
+\end{equation*}
+
+\begin{align*}
+e^{-i (H_0 + H_1) t} &= e^{-i H_0 t} e^{-i H_1 t} + \mathcal{O}(t^2) \\
+e^{-i (H_0 + H_1) t} &= e^{-i H_0 t/2} e^{-i H_1 t} e^{-i H_0 t/2} + \mathcal{O}(t^3)
+\end{align*}
+
+\begin{equation*}
+W = e^{i \theta_{\lambda}} \ket{\lambda} \! \bra{\lambda} 
+\end{equation*}
+
+\begin{equation*}
+f(W) = \sum_{\lambda} f(\lambda) \ket{\lambda} \! \bra{\lambda} = \sum_{\lambda} e^{-i \lambda t} \ket{\lambda} \! \bra{\lambda}
+\end{equation*}
+
+\begin{equation*}
+e^{-i \lambda t} = J_0(t) + 2 \sum^{\infty}_{k=1} (-1)^{k} J_{2k}(t) T_{2k}(\cos \theta_{\lambda}) + 2i \sum^{\infty}_{k=1} (-1)^{k-1} J_{2k-1}(t) T_{2k-1}(\cos \theta_{\lambda}) 
+\end{equation*}
+
+\begin{equation*}
+\mathcal{A}(\theta_{\lambda}) I + i \mathcal{B}(\theta_{\lambda}) Z + i \mathcal{C}(\theta_{\lambda}) X + i \mathcal{D}(\theta_{\lambda}) Y
+\end{equation*}
+
+\begin{align*} 
+\mathcal{A}(\lambda)
+&\approx J_0(t) + 2 \sum^{Q}_{k=1} (-1)^{k} J_{2k}(t) T_{2k}(\cos \theta_{\lambda}) \\
+\mathcal{C}(\lambda)
+&\approx 2 \sum^{Q}_{k=1} (-1)^{k-1} J_{2k-1}(t) T_{2k-1}(\cos \theta_{\lambda})
+\end{align*}
+
+\begin{equation*}
+\mathcal{W} = e^{-i \arccos (H/\alpha) Y}
+\end{equation*}
+
+\begin{equation*}
+f (e^{-i \arccos (H/\alpha)}) = e^{-i H t}
+\end{equation*}
+
+\begin{equation*}
+\alpha = \sum^L_{\ell=1} | \alpha_{\ell} |
+\end{equation*}
+
+
+% \begin{align*} 
+% \end{align*}
+
+
+% Symbolic integration with respect to the Haar measure on the unitary group
+% Zbigniew Puchała, Jarosław Adam Miszczak
+% https://arxiv.org/abs/1109.4244
+\end{document}  
